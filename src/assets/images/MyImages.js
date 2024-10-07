@@ -1,0 +1,17 @@
+export default MyImages = {
+  masjid: require('./msjid.png'),
+  half_sun: require('./half-sun.png'),
+  fajr: require('./fajr.png'),
+  zhr: require('./zhr.png'),
+  google: require('./google.png'),
+  asr: require('./asr.png'),
+  loading1: require('./json/loading1.json'),
+  loading2: require('./json/loading2.json'),
+  mgrib: require('./mgrib.png'),
+  isha: require('./isha.png'),
+  degree_circle: require('./degree_circle.png'),
+  needle_msjid: require('./needle_msjid.png'),
+  msjid_needle: require('./msjid_needle.png'),
+  loader: require('./json/btn_loader_white.json'),
+  success_animation: require('./json/lottie_success.json'),
+};
