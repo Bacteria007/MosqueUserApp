@@ -1,5 +1,4 @@
-// src/screens/ResetPasswordScreen.js
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   TextInput,
@@ -10,6 +9,8 @@ import {
   Alert,
   Image,
   ScrollView,
+  Keyboard,
+  KeyboardAvoidingView,
 } from 'react-native';
 import api from '../services/api';
 import CommonStyles from '../assets/styles/CommonStyles';
@@ -19,6 +20,8 @@ import MyImages from '../assets/images/MyImages';
 import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
 import colors from '../assets/colors/AppColors';
 import fonts from '../assets/fonts/MyFonts';
+import WhiteStatusbar from '../components/statusbar/WhiteStatusbar';
+import PrimaryButton from '../components/buttons/PrimaryButton';
 
 const ResetPasswordScreen = ({navigation}) => {
   const [email, setEmail] = useState('');
@@ -50,36 +53,39 @@ const ResetPasswordScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
       <TransparentStatusbar />
-      <Image source={MyImages.masjid} style={CommonStyles.authImage} />
-      <ScrollView style={{flexGrow: 1}}>
-        <View style={styles.bottomContent}>
-          <Text style={CommonStyles.authTitle}>Reset Password</Text>
-          <View>
-            <MyTextInput
-              placeholder="Enter your email"
-              state={email}
-              setState={setEmail}
-              keyboard="email-address"
-              autoCapitalize="none"
-              style={{marginBottom: 10}}
-            />
-            {emailError && (
-              <Text style={CommonStyles.errorText}>{emailError}</Text>
-            )}
+      <View style={CommonStyles.authHeader}>
+        <Text style={CommonStyles.authTitle}>Reset Password</Text>
+        <Text style={CommonStyles.authSubtitle}>Reset Your password!</Text>
+      </View>
+      <View style={CommonStyles.authBottomConatiner}>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <MyTextInput
+            placeholder="Enter your email"
+            state={email}
+            setState={setEmail}
+            keyboard="email-address"
+            autoCapitalize="none"
+            style={{marginBottom: 0}}
+          />
+          {emailError && (
+            <Text style={CommonStyles.errorText}>{emailError}</Text>
+          )}
 
-            <YellowBtn
-              title="Reset Password"
-              onPress={() => handleResetPassword()}
-              loader={loading}
-            />
+          <PrimaryButton
+            title="Reset Password"
+            onPress={() => handleResetPassword()}
+            loader={loading}
+          />
+          {/* Back to Login link at the bottom */}
+          <View style={CommonStyles.authFooter}>
             <Text
               style={styles.login_link}
               onPress={() => navigation.navigate('Login')}>
-              Back to Login
+              Back to <Text style={styles.bold}>Login</Text>
             </Text>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
     </View>
   );
 };
@@ -87,22 +93,27 @@ const ResetPasswordScreen = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     backgroundColor: colors.bg_clr,
   },
-  bottomContent: {
-    flex: 1,
+  scrollContainer: {
+    flexGrow: 1,
+  },
+  content: {
     paddingHorizontal: 16,
-    // justifyContent: 'center',
-    // alignItems:'center',
-    width: '100%',
+  },
+  footer: {
+    padding: 20,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
   },
   login_link: {
-    color: colors.white,
-    textAlign: 'right',
+    color: colors.primary,
+    textAlign: 'center',
     fontSize: 12,
-    marginRight: 10,
     fontFamily: fonts.normal,
+  },
+  bold: {
+    fontFamily: fonts.bold,
     textDecorationLine: 'underline',
   },
 });

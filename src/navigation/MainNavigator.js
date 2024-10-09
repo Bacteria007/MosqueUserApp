@@ -11,7 +11,7 @@ import fonts from '../assets/fonts/MyFonts';
 import SettingsScreen from '../screens/SettingsScreen';
 
 const Tab = createBottomTabNavigator();
-const activeColor = colors.secondary;
+const activeColor = colors.teal;
 const inactiveColor = colors.tab_inactive;
 const iconSize = 22;
 

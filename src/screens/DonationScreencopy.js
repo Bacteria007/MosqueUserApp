@@ -22,7 +22,7 @@ import {Icons} from '../assets/icons/Icons';
 import MyTextInput from '../components/inputs/MyTextInput';
 import ReactNativeModal from 'react-native-modal';
 
-const DonationScreen = () => {
+const DonationScreencopy = () => {
   const inputsGap = 20;
   const [step, setStep] = useState(1); // 1: Amount, 2: User Info, 3: Card Details
   const [donationAmount, setDonationAmount] = useState(100);
@@ -80,97 +80,151 @@ const DonationScreen = () => {
 
       {/* Conditional rendering based on the step */}
       {step === 1 && (
-        <ScrollView contentContainerStyle={{flexGrow: 1}}>
-          <View
-            style={[styles.bottomSection, {justifyContent: 'space-around'}]}>
-            <View>
-              {/* Radio buttons for donation type */}
-              <View style={styles.radioGroup}>
-                <View style={styles.radioButtonContainer}>
-                  <Pressable
-                    onPress={() => setDonationType(DonationTypes.SADQA)}
-                    style={[
-                      styles.radioButton,
-                      donationType === DonationTypes.SADQA &&
-                        styles.radioButtonSelected,
-                    ]}>
-                    {donationType === DonationTypes.SADQA ? (
-                      <Icons.Ionicons
-                        name={'radio-button-on'}
-                        color={colors.primary}
-                        size={20}
-                      />
-                    ) : (
-                      <Icons.Ionicons
-                        name={'radio-button-off'}
-                        color={colors.primary}
-                        size={20}
-                      />
-                    )}
-                    <Text style={styles.radioButtonText}>Sadqa</Text>
-                  </Pressable>
-                  <Pressable
-                    onPress={() => setDonationType(DonationTypes.ZAKAT)}
-                    style={[
-                      styles.radioButton,
-                      // donationType === DonationTypes.ZAKAT &&
-                      styles.radioButtonSelected,
-                    ]}>
-                    {donationType === DonationTypes.ZAKAT ? (
-                      <Icons.Ionicons
-                        name={'radio-button-on'}
-                        color={colors.primary}
-                        size={20}
-                      />
-                    ) : (
-                      <Icons.Ionicons
-                        name={'radio-button-off'}
-                        color={colors.primary}
-                        size={20}
-                      />
-                    )}
-                    <Text style={styles.radioButtonText}>Zakat/Fitrana</Text>
-                  </Pressable>
-                </View>
+        <View style={[styles.bottomSection, {justifyContent: 'space-around'}]}>
+          {/* amount */}
+          {/* <View style={[styles.buttonContainer, {marginBottom: inputsGap}]}>
+            <LinearGradient
+              colors={['#FCA625', '#966316']}
+              start={{x: 0, y: 0}}
+              end={{x: 1, y: 0}}
+              style={styles.gradientButton}>
+              <Text style={styles.buttonText}>Donation Amount</Text>
+              <View style={styles.circle}>
+                <Text style={styles.circleText}>{donationAmount}</Text>
               </View>
-              {/* <Text style={styles.modalTitle}>Donation Amount</Text> */}
-              <DonationTextinput
-                style={{marginBottom: 20}}
-                setState={setDonationAmount}
-                state={donationAmount}
-                placeholder={`Donation Amount`}
-                keyboard="numeric"
-              />
-              {/* User info */}
-              <DonationTextinput
-                style={{marginBottom: 20}}
-                state={name}
-                setState={setName}
-                placeholder="Name"
-              />
-              <DonationTextinput
-                style={{marginBottom: 20}}
-                state={contact}
-                setState={setContact}
-                placeholder="Contact"
-              />
-              <DonationTextinput
-                style={{marginBottom: 20}}
-                state={email}
-                setState={setEmail}
-                placeholder="Email"
-              />
+            </LinearGradient>
+          </View> */}
+          <View>
+            <Text style={styles.modalTitle}>Donation Amount</Text>
+            <DonationTextinput
+              setState={setDonationAmount}
+              state={donationAmount}
+              placeholder={`${donationAmount}`}
+              keyboard="numeric"
+            />
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                marginBottom: inputsGap,
+              }}>
+              <Pressable
+                onPress={() => setDonationAmount(10)}
+                style={styles.circle}>
+                <Text style={styles.circleText}>10</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => setDonationAmount(50)}
+                style={styles.circle}>
+                <Text style={styles.circleText}>50</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => setDonationAmount(100)}
+                style={styles.circle}>
+                <Text style={styles.circleText}>100</Text>
+              </Pressable>
+              <Pressable onPress={openDonationModal} style={styles.circle}>
+                <Text style={styles.circleText}>Other</Text>
+              </Pressable>
             </View>
-            <Pressable
-              style={styles.buttonContainer}
-              onPress={() => setStep(2)}>
+          </View>
+          {/* <GradientButton onPress={() => setStep(2)} title="Next" /> */}
+
+
+          <Pressable style={styles.buttonContainer} onPress={() => setStep(2)}>
+            <LinearGradient
+              colors={['#FCA625', '#966316']}
+              start={{x: 0, y: 0}}
+              end={{x: 1, y: 0}}
+              style={[styles.gradientButton, {justifyContent: 'center'}]}>
               <Text style={styles.buttonText}>Next</Text>
-            </Pressable>
+            </LinearGradient>
+          </Pressable>
+        </View>
+      )}
+
+      {step === 2 && (
+        <ScrollView contentContainerStyle={{flexGrow: 1}}>
+          <View style={styles.bottomSection}>
+            {/* Radio buttons for donation type */}
+            <View style={styles.radioGroup}>
+              <View style={styles.radioButtonContainer}>
+                <Pressable
+                  onPress={() => setDonationType(DonationTypes.SADQA)}
+                  style={[
+                    styles.radioButton,
+                    donationType === DonationTypes.SADQA &&
+                      styles.radioButtonSelected,
+                  ]}>
+                  {donationType === DonationTypes.SADQA ? (
+                    <Icons.Ionicons
+                      name={'radio-button-on'}
+                      color={colors.white}
+                      size={20}
+                    />
+                  ) : (
+                    <Icons.Ionicons
+                      name={'radio-button-off'}
+                      color={colors.white}
+                      size={20}
+                    />
+                  )}
+                  <Text style={styles.radioButtonText}>Sadqa</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => setDonationType(DonationTypes.ZAKAT)}
+                  style={[
+                    styles.radioButton,
+                    // donationType === DonationTypes.ZAKAT &&
+                    styles.radioButtonSelected,
+                  ]}>
+                  {donationType === DonationTypes.ZAKAT ? (
+                    <Icons.Ionicons
+                      name={'radio-button-on'}
+                      color={colors.white}
+                      size={20}
+                    />
+                  ) : (
+                    <Icons.Ionicons
+                      name={'radio-button-off'}
+                      color={colors.white}
+                      size={20}
+                    />
+                  )}
+                  <Text style={styles.radioButtonText}>Zakat/Fitrana</Text>
+                </Pressable>
+              </View>
+            </View>
+            {/* User info */}
+            <DonationTextinput
+              style={{marginBottom: 20}}
+              state={name}
+              setState={setName}
+              placeholder="Name"
+            />
+            <DonationTextinput
+              style={{marginBottom: 20}}
+              state={contact}
+              setState={setContact}
+              placeholder="Contact"
+            />
+            <DonationTextinput
+              style={{marginBottom: 20}}
+              state={email}
+              setState={setEmail}
+              placeholder="Email"
+            />
+          </View>
+
+          {/* Back and Next buttons at the bottom */}
+          <View style={styles.bottomButtonsContainer}>
+            <GradientButton onPress={() => setStep(1)} title="Back" />
+            <GradientButton onPress={() => setStep(3)} title="Next" />
           </View>
         </ScrollView>
       )}
 
-      {step === 2 && (
+      {step === 3 && (
         <ScrollView contentContainerStyle={{flexGrow: 1}}>
           <View style={styles.bottomSection}>
             {/* card details */}
@@ -213,18 +267,8 @@ const DonationScreen = () => {
 
           {/* Back and Donate Now buttons at the bottom */}
           <View style={styles.bottomButtonsContainer}>
-            <Pressable
-              style={styles.backBtn}
-              onPress={() => setStep(1)}>
-              <Text style={[styles.buttonText,{color:colors.black}]}>Back</Text>
-            </Pressable>
-            <Pressable
-              style={styles.donateBtn}
-              onPress={handleDonateNow}>
-              <Text style={styles.buttonText}>Donate</Text>
-            </Pressable>
-            {/* <GradientButton onPress={() => setStep(1)} title="Back" />
-            <GradientButton onPress={handleDonateNow} title="Donate Now" /> */}
+            <GradientButton onPress={() => setStep(2)} title="Back" />
+            <GradientButton onPress={handleDonateNow} title="Donate Now" />
           </View>
         </ScrollView>
       )}
@@ -269,7 +313,7 @@ const DonationScreen = () => {
 
 const styles = StyleSheet.create({
   radioGroup: {
-    marginTop: 20,
+    marginTop: 0,
     marginBottom: 20,
   },
   radioLabel: {
@@ -299,7 +343,7 @@ const styles = StyleSheet.create({
   radioButtonText: {
     fontSize: 12,
     fontFamily: fonts.medium,
-    color: colors.black,
+    color: colors.white,
   },
   bottomSection: {
     flex: 1,
@@ -317,34 +361,30 @@ const styles = StyleSheet.create({
   buttonContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.primary,
-    borderRadius: 10,
-    paddingVertical: 8,
-    width:'100%'
   },
-  backBtn:{
+  gradientButton: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.white,
-    borderRadius: 10,
-    borderWidth:1.5,
-    borderColor:colors.primary,
-    paddingVertical: 8,
-    width:'30%'
+    justifyContent: 'space-between',
+    width: '28%',
+    height: 50,
+    borderRadius: 99,
+    // paddingLeft: 20,
+    alignSelf: 'flex-end',
   },
-  donateBtn:{
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.primary,
-    borderRadius: 10,
-    paddingVertical: 8,
-    width:'30%'
-  },
-
+  // gradientButton: {
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   justifyContent: 'space-between',
+  //   width: '100%',
+  //   height: 60,
+  //   borderRadius: 99,
+  //   paddingLeft: 20,
+  // },
   buttonText: {
-    color: colors.white,
-    fontSize: 14,
-    fontFamily: fonts.medium,
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: fonts.semibold,
     textAlign: 'center',
     textAlignVertical: 'center',
   },
@@ -406,4 +446,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DonationScreen;
+export default DonationScreencopy;

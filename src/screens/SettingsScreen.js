@@ -5,20 +5,30 @@ import {
   Switch,
   FlatList,
   StyleSheet,
-  Modal,
-  Image,
   Pressable,
 } from 'react-native';
 import CommonStyles from '../assets/styles/CommonStyles';
 import colors from '../assets/colors/AppColors';
 import MainScreensHeader from '../components/headers/MainScreensHeader';
 import fonts from '../assets/fonts/MyFonts';
-import MyImages from '../assets/images/MyImages';
 import {Icons} from '../assets/icons/Icons';
-import GradientButton from '../components/buttons/GradientButton';
 import PushNotification from 'react-native-push-notification';
-
+import Sound from 'react-native-sound';
+import ReactNativeModal from 'react-native-modal';
+import {
+  useRingerMode,
+  RINGER_MODE,
+  RingerModeType,
+} from 'react-native-volume-manager';
+import { appName } from '../services/constants';
+const modeText = {
+  [RINGER_MODE.silent]: 'Silent',
+  [RINGER_MODE.normal]: 'Normal',
+  [RINGER_MODE.vibrate]: 'Vibrate',
+};
+let alarm;
 const SettingsScreen = () => {
+  const {mode, error, setMode} = useRingerMode();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedAlarmId, setSelectedAlarmId] = useState(null); // Track the selected alarm ID
   const [selectedDuration, setSelectedDuration] = useState('default');
@@ -27,33 +37,103 @@ const SettingsScreen = () => {
   const [selectedRingtone, setSelectedRingtone] = useState('DUA');
   const closeDonationModal = () => setIsModalVisible(false);
 
-  const scheduleAlarm =() => {
+  // Function to play the alarm sound in an infinite loop
+  const playAlarmSound = () => {
+    const alarm = new Sound('alarm_sound.mp3', Sound.MAIN_BUNDLE, error => {
+      if (error) {
+        console.error('Failed to load sound', error);
+        return;
+      }
+
+      alarm.setNumberOfLoops(0); // Infinite loop to play continuously
+      alarm.play(success => {
+        if (!success) {
+          console.error('Failed to play sound');
+        }
+      });
+    });
+  };
+
+  // Function to stop the alarm sound
+  const stopAlarmSound = () => {
+    if (alarm) {
+      alarm.stop(() => {
+        alarm.release(); // Release sound resource when finished
+      });
+    }
+  };
+
+  // Function to schedule the notification alarm
+  // Function to schedule the notification alarm
+  const scheduleAlarm = () => {
     console.log('alarm caled');
 
     PushNotification.localNotificationSchedule({
-      // The message to display
-      message: "It's time for the prayer!",
-
-      // Set the scheduled time (must be a future time)
-      date: new Date(Date.now() + 30 * 1000), // in 60 secs
-      actions: ['OK'],
-
-      // Customize the notification sound
-      soundName: 'alarm_sound.mp3', // Add your own custom sound file
-
-      // Configure for Android
-      allowWhileIdle: true, // Shows the notification even if the phone is in idle mode
-      repeatType: 'day',
-      repeatTime: 2,
-      // Android-specific configurations
+      message: `${appName}`,
+      date: new Date(Date.now() + 1 * 1000),
+      soundName: 'alarm_sound.mp3',
+      allowWhileIdle: true,
       importance: 'high',
       vibrate: true,
       vibration: 300,
       priority: 'max',
-      channelId: 'prayer_reminder', // Ensure this matches your channel ID
+      channelId: 'prayer_reminder',
     });
   };
-  scheduleAlarm()
+  scheduleAlarm();
+
+  const [isSilent, setIsSilent] = useState(false);
+
+  const handlePrayerReminderNotification = () => {
+    console.log('Prayer Reminder Notification set for:', selectedDuration);
+    // Add your notification scheduling logic here
+  };
+
+  const handleRingtoneSelection = () => {
+    console.log('Ringtone selected:', selectedRingtone);
+    // Add your ringtone selection logic here
+  };
+
+  // Function to execute the appropriate handler based on selectedAlarmId
+  const handleModalOkPress = () => {
+    switch (selectedAlarmId) {
+      case 1:
+        handlePrayerReminderNotification();
+        break;
+      case 2:
+        handleRingtoneSelection();
+        break;
+      case 3:
+        handleSilentModeSelection();
+        break;
+      default:
+        break;
+    }
+    closeDonationModal(); // Close modal after handling
+  };
+  // Function to silent the phone for selected duration
+  const enableSilentModeForDuration = duration => {
+    // Convert the selected duration to milliseconds
+    const durationInMillis = duration * 60 * 1000;
+
+    // Activate silent mode
+    setIsSilent(true);
+
+    setTimeout(() => {
+      setIsSilent(false);
+      console.log(`Silent mode deactivated after ${duration} minutes`);
+    }, durationInMillis);
+  };
+
+  // Handle OK button click in the modal for Silent Mode
+  const handleSilentModeSelection = () => {
+    const duration = selectedSilentDuration === '15 min' ? 15 : 30;
+    enableSilentModeForDuration(duration); // Silent for 15 or 30 minutes
+  };
+
+  useEffect(() => {
+    scheduleAlarm();
+  }, []);
   const ringtones = {
     DUA: 'Dua',
     AZAN: 'Azan',
@@ -118,8 +198,8 @@ const SettingsScreen = () => {
         <Text style={styles.alarmDesc}>{item.desc}</Text>
       </View>
       <Switch
-        trackColor={{false: colors.tab_inactive, true: colors.secondary}}
-        thumbColor={alarmStates[item.id] ? colors.secondary : colors.white}
+        trackColor={{false: colors.tab_inactive, true: colors.primary}}
+        thumbColor={alarmStates[item.id] ? colors.primary : colors.white}
         ios_backgroundColor={colors.primary}
         onValueChange={() => toggleAlarm(item.id)}
         value={alarmStates[item.id]}
@@ -155,9 +235,9 @@ const SettingsScreen = () => {
     switch (selectedAlarmId) {
       case 1:
         return (
-          <View style={{width: '100%', alignItems: 'center'}}>
+          <View style={{width: '100%', alignItems: 'flex-start'}}>
             <Text style={styles.modalTitle}>Prayer Reminder Before</Text>
-            <View style={{flexDirection: 'row', gap: 5}}>
+            <View style={{flexDirection: 'column', gap: 5}}>
               {Object.keys(alarmDurations).map(key =>
                 renderRadioButton(
                   alarmDurations[key],
@@ -170,9 +250,9 @@ const SettingsScreen = () => {
         );
       case 2:
         return (
-          <View style={{width: '90%', alignItems: 'center'}}>
+          <View style={{width: '90%', alignItems: 'flex-start'}}>
             <Text style={styles.modalTitle}>Select Ringtone</Text>
-            <View style={{flexDirection: 'row', gap: 10}}>
+            <View style={{flexDirection: 'column', gap: 5}}>
               {Object.keys(ringtones).map(key =>
                 renderRadioButton(
                   ringtones[key],
@@ -185,9 +265,9 @@ const SettingsScreen = () => {
         );
       case 3:
         return (
-          <View style={{width: '90%', alignItems: 'center'}}>
+          <View style={{width: '90%', alignItems: 'flex-start'}}>
             <Text style={styles.modalTitle}>Auto Silent For</Text>
-            <View style={{flexDirection: 'row', gap: 10}}>
+            <View style={{flexDirection: 'column', gap: 5}}>
               {Object.keys(silentDurations).map(key =>
                 renderRadioButton(
                   silentDurations[key],
@@ -214,37 +294,56 @@ const SettingsScreen = () => {
         />
       </View>
       {/* Modal for Alarm Settings */}
-      <Modal
+      <ReactNativeModal
         statusBarTranslucent
         visible={isModalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={closeDonationModal}>
+        style={{margin: 0, flex: 1}}
+        animationIn={'fadeIn'}
+        animationOut={'fadeOut'}
+        onDismiss={closeDonationModal}
+        onBackdropPress={closeDonationModal}
+        onBackButtonPress={closeDonationModal}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Image
-              source={MyImages.masjid}
-              style={{
-                height: 60,
-                width: 60,
-                borderRadius: 99,
-                resizeMode: 'cover',
-              }}
-            />
             {getModalContent()}
-            <GradientButton
-              title={'OK'}
-              onPress={closeDonationModal}
-              style={{width: '40%', height: 40, marginTop: 10}}
-            />
+            <View
+              style={{
+                flexDirection: 'row',
+                width: '100%',
+                justifyContent: 'space-between',
+              }}>
+              <Pressable onPress={closeDonationModal} style={styles.okBtn}>
+                <Text style={styles.buttonText}>Cancel</Text>
+              </Pressable>
+              <Pressable onPress={handleModalOkPress} style={styles.okBtn}>
+                <Text style={styles.buttonText}>OK</Text>
+              </Pressable>
+            </View>
           </View>
         </View>
-      </Modal>
+      </ReactNativeModal>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  okBtn: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.light_white,
+    borderRadius: 10,
+    paddingVertical: 8,
+    width: '40%',
+    marginTop: 10,
+  },
+
+  buttonText: {
+    color: colors.white,
+    fontSize: 12,
+    fontFamily: fonts.medium,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+  },
   alarmContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -253,14 +352,14 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   alarmTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: fonts.semibold,
-    color: colors.white,
+    color: colors.black,
   },
   alarmDesc: {
     fontSize: 12,
     fontFamily: fonts.normal,
-    color: colors.white,
+    color: colors.black,
     textAlign: 'justify',
   },
   // Modal styles
@@ -280,7 +379,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 14,
     fontFamily: fonts.semibold,
-    color: colors.secondary,
+    color: colors.white,
     marginBottom: 5,
     marginTop: 10,
   },
@@ -288,7 +387,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 10,
-    flex: 1,
+    // flex: 1,
   },
   radioButtonSelected: {
     // backgroundColor: colors.secondary,

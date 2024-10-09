@@ -7,7 +7,7 @@ import CommonStyles from '../assets/styles/CommonStyles';
 import colors from '../assets/colors/AppColors';
 import MyTextInput from '../components/inputs/MyTextInput';
 import MainScreensHeader from '../components/headers/MainScreensHeader';
-import MyButton from '../components/buttons/MyButton';
+import MyButton from '../components/buttons/PrimaryButton';
 import YellowBtn from '../components/buttons/YellowBtn';
 
 const DonationScreen = () => {

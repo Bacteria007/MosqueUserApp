@@ -14,7 +14,7 @@ const MyTextInput = ({
             value={state}
             onChangeText={t => setState(t)}
             placeholder={placeholder}
-            placeholderTextColor={colors.black}
+            placeholderTextColor={colors.white}
             style={[styles.inputStyle, { ...style }]}
             keyboardType={`${keyboard}`}
             autoCapitalize='none'
@@ -33,9 +33,9 @@ const styles = StyleSheet.create({
         paddingLeft: 16,
         marginBottom: 10,
         borderRadius: 99,
-        backgroundColor: colors.primaryLight,
+        backgroundColor: colors.light_white,
         fontFamily: fonts.normal,
         fontSize: 14,
-        color: colors.black,
+        color: colors.white,
     }
 })

@@ -1,20 +1,19 @@
 const colors = {
-  white: 'white',
-  blue:"#1974ec",
+  white: '#fff',
+  blue: '#1974ec',
+  primary: '#009a9a',
+  teal: '#009a9a',
   black: 'black',
-  // primary: '#1e4f4c', //pic jesa
-  primary: '#315c53',  
-  secondary:'#FCA625',
-  primaryLight:'#96c8fd',
+  secondary: '#FCA625',
+  primaryLight: 'rgba(41, 185, 185, 0.13)',
   tab_inactive: '#C0C5C2',
-  bg_light:'#d0e9fd',
-  bg_light1:'#71b7fd',
-  lighr_grey:'#ddd',
-  // bg_clr:'#1e4f4c', //pic jesa
-  bg_clr:'#315c53', 
-  forground_clr:'#14a6db',
-  forground_txt:'#fff',
-  light_white:'#E2E2E270'
-  // light_white:'rgba(255, 255, 255, 0.2)'
+  bg_light: '#d0e9fd',
+  bg_light1: '#71b7fd',
+  lighr_grey: '#ddd',
+  bg_clr: '#fff',
+  forground_clr: '#14a6db',
+  forground_txt: '#000',
+  light_white: '#E2E2E270',
+  light_black:'rgba(0, 0, 0, 0.6)'
 };
 export default colors;

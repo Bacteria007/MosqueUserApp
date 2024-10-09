@@ -14,7 +14,7 @@ const DonationTextinput = ({
             value={state}
             onChangeText={t => setState(t)}
             placeholder={placeholder}
-            placeholderTextColor={colors.white}
+            placeholderTextColor={colors.black}
             style={[styles.inputStyle, { ...style }]}
             keyboardType={`${keyboard}`}
             autoCapitalize='none'
@@ -36,6 +36,6 @@ const styles = StyleSheet.create({
         backgroundColor: colors.light_white,
         fontFamily: fonts.normal,
         fontSize: 12,
-        color: colors.white,
+        color: colors.black,
     }
 })

@@ -8,10 +8,10 @@ import fonts from '../assets/fonts/MyFonts';
 import colors from '../assets/colors/AppColors';
 import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
 import LottieView from 'lottie-react-native';
+import { appName } from '../services/constants';
 
 const SplashScreen = () => {
   const navigation = useNavigation();
-  const appName = 'Islamiya Mosque';
   const bottomLine = 'Stay Connected with Your Faith';
   useEffect(() => {
     // Set a timeout of 2 seconds before navigating to the Login screen
@@ -24,17 +24,15 @@ const SplashScreen = () => {
   }, [navigation]);
 
   return (
-    <View style={CommonStyles.container}>
-      <TransparentStatusbar />
-      <Image
-        source={MyImages.masjid}
-        style={{height: '70%', width: '100%', resizeMode: 'cover'}}
-      />
-      <View style={styles.bottomContainer}>
+    <View style={styles.container}>
+      <WhiteStatusbar />
+      <View style={styles.centerContainer}>
         <Text style={styles.appName}>{appName}</Text>
         <Text style={styles.bottomLine}>{bottomLine}</Text>
+      </View>
+      <View style={styles.lottieContainer}>
         <LottieView
-          style={{height: 80, width: 80}}
+          style={styles.lottie}
           source={MyImages.loading1}
           autoPlay
           loop={true}
@@ -46,19 +44,51 @@ const SplashScreen = () => {
 
 export default SplashScreen;
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.primary,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   appName: {
     fontSize: 22,
     fontFamily: fonts.bold,
     color: colors.white,
+    width:'60%'
   },
   bottomLine: {
     fontSize: 14,
     fontFamily: fonts.normal,
     color: colors.white,
   },
-  bottomContainer: {
-    justifyContent: 'center',
+  lottieContainer: {
+    justifyContent: 'flex-end',
     alignItems: 'center',
-    flex: 1,
+    paddingBottom: 20, // Adjust to move the Lottie animation slightly up if necessary
+  },
+  lottie: {
+    height: 80,
+    width: 80,
   },
 });
+
+  // <View style={CommonStyles.container}>
+    //   <WhiteStatusbar />
+    //   <Image
+    //     source={MyImages.masjid}
+    //     style={{height: '70%', width: '100%', resizeMode: 'cover'}}
+    //   />
+    //   <View style={styles.bottomContainer}>
+    //     <Text style={styles.appName}>{appName}</Text>
+    //     <Text style={styles.bottomLine}>{bottomLine}</Text>
+    //     <LottieView
+    //       style={{height: 80, width: 80}}
+    //       source={MyImages.loading1}
+    //       autoPlay
+    //       loop={true}
+    //     />
+    //   </View>
+    // </View>

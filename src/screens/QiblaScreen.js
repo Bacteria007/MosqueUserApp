@@ -7,6 +7,7 @@ import {
   PermissionsAndroid,
   Platform,
   Animated,
+  StatusBar,
 } from 'react-native';
 import CompassHeading from 'react-native-compass-heading';
 import Geolocation from '@react-native-community/geolocation';
@@ -17,6 +18,8 @@ import CommonStyles from '../assets/styles/CommonStyles';
 import ScreenWrapper from '../components/wrapers/ScreenWrapper';
 import MainScreensHeader from '../components/headers/MainScreensHeader';
 import {Icons} from '../assets/icons/Icons';
+import MyHeader from '../components/headers/MyHeader';
+import WhiteStatusbar from '../components/statusbar/WhiteStatusbar';
 
 const QiblaScreen = () => {
   const [heading, setHeading] = useState(0);
@@ -99,12 +102,14 @@ const QiblaScreen = () => {
 
   return (
     <ScreenWrapper refreshAct={() => getCurrentLocation()}>
+     <WhiteStatusbar/>
       <View style={CommonStyles.container}>
         <MainScreensHeader
           title={'Qibla Direction'}
           subTitle={'Stay Connected with Your Faith'}
         />
         {/* Compass Visualization with Card Background */}
+        <View style={{flex:1,justifyContent:'space-around',alignItems:'center',}}>
         <View style={styles.compassContainer}>
           <Image
             source={MyImages.degree_circle}
@@ -122,7 +127,7 @@ const QiblaScreen = () => {
           <Icons.MaterialCommunityIcons
             name="compass"
             size={20}
-            color={colors.secondary}
+            color={colors.teal}
           />
           <Text style={styles.infoText}>
             Qibla Direction: {qiblaDirection.toFixed(2)}°
@@ -131,6 +136,7 @@ const QiblaScreen = () => {
             Rotate: {(qiblaDirection - heading).toFixed(2)}° to face Qibla
           </Text> */}
         </View>
+      </View>
       </View>
     </ScreenWrapper>
   );
@@ -144,9 +150,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg_clr,
   },
   compassCard: {
-    backgroundColor: colors.primary,
-    padding: 20,
-    borderRadius: 999,
+    width: 260,
+    height: 260,
+    justifyContent: 'center',
+    alignItems: 'center',
+    // flex: 1,
+    alignSelf: 'center',
+    backgroundColor: colors.white,
     // iOS shadow
     shadowColor: colors.primary,
     shadowOffset: {width: 0, height: 4},
@@ -154,20 +164,29 @@ const styles = StyleSheet.create({
     shadowRadius: 4.65,
     // Android elevation
     elevation: 8,
-    marginBottom: 40,
-    alignSelf: 'center',
+    borderRadius:999
   },
   compassContainer: {
-    width: 230,
-    height: 230,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flex: 1,
-    alignSelf: 'center',
-  },
-  compassBackground: {
     width: 260,
     height: 260,
+    justifyContent: 'center',
+    alignItems: 'center',
+    // flex: 1,
+    alignSelf: 'center',
+    backgroundColor: colors.white,
+    // iOS shadow
+    shadowColor: colors.primary,
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    // Android elevation
+    elevation: 8,
+    borderRadius:999
+  },
+  compassBackground: {
+    width: 230,
+    height: 230,
+    borderRadius:999
   },
   needle: {
     width: 120,
@@ -176,16 +195,18 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   infoCard: {
-    position: 'absolute',
     bottom: 20,
     width: '100%',
     gap: 10,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'absolute',
+
   },
   infoText: {
-    color: colors.white,
+
+    color: colors.black,
     fontSize: 12,
     fontFamily: fonts.medium,
     textAlign: 'center',
