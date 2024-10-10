@@ -11,33 +11,33 @@ import {LogBox, Platform, PermissionsAndroid} from 'react-native';
 LogBox.ignoreAllLogs(true);
 
 const App = () => {
-  useEffect(() => {
-    console.log('Configuring notifications...');
-    PushNotification.configure({
-      onNotification: function (notification) {
-        console.log('NOTIFICATION RECEIVED:', notification);
-        // process the notification
-      },
-      requestPermissions: Platform.OS === 'ios',
-    });
+  // useEffect(() => {
+  //   console.log('Configuring notifications...');
+  //   PushNotification.configure({
+  //     onNotification: function (notification) {
+  //       console.log('NOTIFICATION RECEIVED:', notification);
+  //       // process the notification
+  //     },
+  //     requestPermissions: Platform.OS === 'ios',
+  //   });
 
-    createNotificationChannel();
-  }, []);
+  //   createNotificationChannel();
+  // }, []);
 
-  const createNotificationChannel = () => {
-    console.log('Creating notification channel...');
-    PushNotification.createChannel(
-      {
-        channelId: 'prayer_reminder',
-        channelName: 'Prayer Alarm',
-        playSound: true,
-        soundName: 'alarm_sound',
-        importance: 4,
-        vibrate: true,
-      },
-      created => console.log(`Channel created successfully: ${created}`),
-    );
-  };
+  // const createNotificationChannel = () => {
+  //   console.log('Creating notification channel...');
+  //   PushNotification.createChannel(
+  //     {
+  //       channelId: 'prayer_reminder',
+  //       channelName: 'Prayer Alarm',
+  //       playSound: true,
+  //       soundName: 'azan.mp3',
+  //       importance: 4,
+  //       vibrate: true,
+  //     },
+  //     created => console.log(`Channel created successfully: ${created}`),
+  //   );
+  // };
 
   return (
     <Provider store={store}>

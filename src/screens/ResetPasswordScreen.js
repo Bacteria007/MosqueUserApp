@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import api from '../services/api';
 import CommonStyles from '../assets/styles/CommonStyles';
-import MyTextInput from '../components/inputs/MyTextInput';
+import AuthTextinput from '../components/inputs/AuthTextinput';
 import YellowBtn from '../components/buttons/YellowBtn';
 import MyImages from '../assets/images/MyImages';
 import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
@@ -53,19 +53,23 @@ const ResetPasswordScreen = ({navigation}) => {
   return (
     <View style={styles.container}>
       <TransparentStatusbar />
-      <View style={CommonStyles.authHeader}>
+      {/* <View style={CommonStyles.authHeader}>
         <Text style={CommonStyles.authTitle}>Reset Password</Text>
         <Text style={CommonStyles.authSubtitle}>Reset Your password!</Text>
-      </View>
+      </View> */}
+       <Image
+        source={MyImages.masjid}
+        style={{height: '60%', width: '100%', resizeMode: 'cover'}}
+      />
       <View style={CommonStyles.authBottomConatiner}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <MyTextInput
+          <AuthTextinput
             placeholder="Enter your email"
             state={email}
             setState={setEmail}
             keyboard="email-address"
             autoCapitalize="none"
-            style={{marginBottom: 0}}
+            style={{marginBottom: 10}}
           />
           {emailError && (
             <Text style={CommonStyles.errorText}>{emailError}</Text>

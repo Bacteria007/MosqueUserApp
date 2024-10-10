@@ -22,10 +22,11 @@ import fonts from '../assets/fonts/MyFonts';
 import MyImages from '../assets/images/MyImages';
 import CommonStyles from '../assets/styles/CommonStyles';
 import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
-import MyTextInput from '../components/inputs/MyTextInput';
+import AuthTextinput from '../components/inputs/AuthTextinput';
 import PrimaryButton from '../components/buttons/PrimaryButton';
 import {Icons} from '../assets/icons/Icons';
 import {useNavigation} from '@react-navigation/native';
+import {LoginManager, AccessToken, Settings} from 'react-native-fbsdk-next';
 
 const LoginScreen = () => {
   const [email, setEmail] = useState('');
@@ -36,24 +37,9 @@ const LoginScreen = () => {
   const [passwordError, setPasswordError] = useState('');
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const navigation = useNavigation();
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener(
-      'keyboardDidShow',
-      () => {
-        setKeyboardVisible(true);
-      },
-    );
-    const keyboardDidHideListener = Keyboard.addListener(
-      'keyboardDidHide',
-      () => {
-        setKeyboardVisible(false);
-      },
-    );
 
-    return () => {
-      keyboardDidHideListener.remove();
-      keyboardDidShowListener.remove();
-    };
+  useEffect(() => {
+    Settings.initializeSDK();
   }, []);
 
   const handleLogin = async () => {
@@ -76,21 +62,42 @@ const LoginScreen = () => {
       // navigation.navigate('Prayer Times');
     }
   };
-
+  const handleFacebookLogin = async () => {
+    try {
+      const result = await LoginManager.logInWithPermissions([
+        'public_profile',
+        'email',
+      ]);
+      if (result.isCancelled) {
+        console.log('Login cancelled');
+      } else {
+        const data = await AccessToken.getCurrentAccessToken();
+        if (data) {
+          console.log(
+            'Facebook Access Token:==>>>> ',
+            data.accessToken.toString(),
+          );
+        }
+      }
+    } catch (error) {
+      console.error('Facebook Login fail with error: ', error);
+    }
+  };
   return (
-    <View
-      style={styles.container}
-      // behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      // keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
-    >
+    <View style={styles.container}>
       <TransparentStatusbar />
-      <View style={CommonStyles.authHeader}>
+      {/* <View style={CommonStyles.authHeader}>
         <Text style={CommonStyles.authTitle}>Login</Text>
         <Text style={CommonStyles.authSubtitle}>Welcome Back!</Text>
-      </View>
+      </View> */}
+       
+        <Image
+        source={MyImages.masjid}
+        style={{height: '60%', width: '100%', resizeMode: 'cover'}}
+      />
       <View style={CommonStyles.authBottomConatiner}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <MyTextInput
+          <AuthTextinput
             placeholder="Email"
             state={email}
             setState={setEmail}
@@ -100,7 +107,7 @@ const LoginScreen = () => {
           {emailError && (
             <Text style={CommonStyles.errorText}>{emailError}</Text>
           )}
-          <MyTextInput
+          <AuthTextinput
             placeholder="Password"
             state={password}
             setState={setPassword}
@@ -124,18 +131,14 @@ const LoginScreen = () => {
             loader={loading}
           />
           {/* Sticky footer */}
-          <View
-            style={[
-              CommonStyles.authFooter,
-              // isKeyboardVisible ?{marginTop:100}:{marginBottom:40}
-            ]}>
+          <View style={[CommonStyles.authFooter]}>
             <Text
               style={styles.signup_link}
               onPress={() => navigation.navigate('Signup')}>
               Don't have an account? <Text style={styles.bold}>Sign Up</Text>
             </Text>
 
-            <View style={styles.socialButtons}>
+            {/* <View style={styles.socialButtons}>
               <Pressable
                 style={[
                   styles.googleBtn,
@@ -147,6 +150,7 @@ const LoginScreen = () => {
                 />
               </Pressable>
               <Pressable
+                onPress={handleFacebookLogin}
                 style={[
                   styles.googleBtn,
                   {backgroundColor: colors.primaryLight},
@@ -157,7 +161,7 @@ const LoginScreen = () => {
                   color={colors.blue}
                 />
               </Pressable>
-            </View>
+            </View> */}
           </View>
         </ScrollView>
       </View>

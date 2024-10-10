@@ -57,7 +57,7 @@ const CommonStyles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   authBottomConatiner: {
-    marginTop: 60,
+    marginTop: 20,
     paddingHorizontal: 16,
     width: '100%',
     flex: 1,
@@ -71,7 +71,7 @@ const CommonStyles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'center',
     alignSelf: 'center',
-    marginTop: 200,
+    // marginTop: 200,
     flex: 1,
   },
   errorText: {color: 'red', marginBottom: 10, marginLeft: 5},

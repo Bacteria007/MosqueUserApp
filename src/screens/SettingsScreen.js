@@ -21,6 +21,7 @@ import {
   RingerModeType,
 } from 'react-native-volume-manager';
 import { appName } from '../services/constants';
+
 const modeText = {
   [RINGER_MODE.silent]: 'Silent',
   [RINGER_MODE.normal]: 'Normal',
@@ -63,24 +64,23 @@ const SettingsScreen = () => {
     }
   };
 
-  // Function to schedule the notification alarm
-  // Function to schedule the notification alarm
   const scheduleAlarm = () => {
     console.log('alarm caled');
 
     PushNotification.localNotificationSchedule({
       message: `${appName}`,
       date: new Date(Date.now() + 1 * 1000),
-      soundName: 'alarm_sound.mp3',
+      soundName: 'azan.mp3',
       allowWhileIdle: true,
       importance: 'high',
       vibrate: true,
       vibration: 300,
       priority: 'max',
       channelId: 'prayer_reminder',
+      // ongoing: true, // Ensures it stays active
+      autoCancel: false, 
     });
   };
-  scheduleAlarm();
 
   const [isSilent, setIsSilent] = useState(false);
 
@@ -93,7 +93,6 @@ const SettingsScreen = () => {
     console.log('Ringtone selected:', selectedRingtone);
     // Add your ringtone selection logic here
   };
-
   // Function to execute the appropriate handler based on selectedAlarmId
   const handleModalOkPress = () => {
     switch (selectedAlarmId) {

@@ -70,7 +70,7 @@ const MainNavigator = () => (
             />
           );
         }
-         else if (route.name === 'Donations') {
+         else if (route.name === 'Donate') {
           return (
             <Icons.FontAwesome5
               size={21}
@@ -93,7 +93,7 @@ const MainNavigator = () => (
     <Tab.Screen name="Prayer Times" component={PrayerTimesScreen} />
     <Tab.Screen name="Qibla" component={QiblaScreen} />
     <Tab.Screen name="Mosque Location" component={MosqueLocationScreen} />
-    <Tab.Screen name="Donations" component={DonationScreen} />
+    <Tab.Screen name="Donate" component={DonationScreen} />
     <Tab.Screen name="Settings" component={SettingsScreen} />
   </Tab.Navigator>
 );

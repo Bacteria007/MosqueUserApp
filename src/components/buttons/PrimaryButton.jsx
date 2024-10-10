@@ -11,7 +11,7 @@ const PrimaryButton = ({ title, onPress, loader }) => {
             onPress={onPress}
             style={[
                 styles.btnStyle,
-                { backgroundColor: colors.primary, marginTop: 20 },
+                { backgroundColor: colors.primary, marginTop: 5 },
             ]}>
             {loader ? (
                 <LottieView

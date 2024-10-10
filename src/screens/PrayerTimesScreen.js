@@ -9,6 +9,9 @@ import {
   RefreshControl,
   ImageBackground,
   Pressable,
+  Platform,
+  Alert,
+  PermissionsAndroid,
 } from 'react-native';
 import ApiService from '../services/api';
 import {appName, GET, prayerTimesURL} from '../services/constants';
@@ -39,30 +42,18 @@ const PrayerTimesScreen = () => {
   const [nextPrayer, setNextPrayer] = useState({});
   const [date, setDate] = useState(new Date()); // Current selected date for the picker
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  // Handle date change
-  const handleDateChange = (event, selectedDate) => {
+ 
+   const handleDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setDatePickerVisibility(false); // Hide the picker
     setDate(currentDate);
     setSelectedDate(moment(currentDate).format(dateformate)); // Format date as needed
   };
+
   const showDatePicker = () => {
     setDatePickerVisibility(true);
   };
 
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
-  };
-
-  // const handleDateChange = (event, selectedDate) => {
-  //   if (event.nativeEvent.type == 'set') {
-  //     // For iOS, selectedDate might not be directly available; instead, we use event.nativeEvent.timestamp
-  //     const finalDate = selectedDate || new Date(event.nativeEvent.timestamp);
-  //     // setDate(finalDate);
-  //     setSelectedDate(finalDate.toISOString().split('T')[0]);
-  //   }
-  //   setDatePickerVisibility(false);
-  // };
   useEffect(() => {
     fetchPrayerTimes();
   }, []);
@@ -73,14 +64,15 @@ const PrayerTimesScreen = () => {
   }, [selectedDate, prayerTimes]);
 
   useEffect(() => {
-    let a = 1;
-    console.log('settings alrams', a++);
-
     if (todayPrayers) {
       calculateUpcomingAndNextPrayers(todayPrayers); // Upcoming and next prayers based on today's prayers
-      schedulePrayerNotifications(todayPrayers); // Schedule notifications for today's prayers
     }
   }, [todayPrayers]);
+
+  useEffect(() => {
+    // Request notification permission when the screen is loaded
+    requestNotificationPermission();
+  }, []);
 
   const fetchPrayerTimes = async () => {
     try {
@@ -132,6 +124,68 @@ const PrayerTimesScreen = () => {
     setUpcomingPrayer(upcoming || prayerTimes[0]); // Default to Fajr if no upcoming prayer found
     setNextPrayer(next || prayerTimes[1]); // Default to Dhuhr if no next prayer found
   };
+
+  const requestNotificationPermission = async () => {
+    if (Platform.OS === 'android' && Platform.Version >= 33) {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+          {
+            title: 'Notification Permission',
+            message: 'This app requires permission to send alarms.',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          console.log('Notification permission granted');
+          // Now create the notification channel and schedule notifications
+          createNotificationChannel();
+          schedulePrayerNotifications(todayPrayers);
+        } else {
+          console.log('Notification permission denied');
+          Alert.alert(
+            'Permission required',
+            'Notification permission is required to receive prayer alarms.',
+          );
+        }
+      } catch (err) {
+        console.warn(err);
+      }
+    } else if (Platform.OS === 'ios') {
+      PushNotification.requestPermissions().then(permission => {
+        if (permission.alert || permission.sound || permission.badge) {
+          console.log('Notification permission granted');
+          // Now create the notification channel and schedule notifications
+          createNotificationChannel();
+          schedulePrayerNotifications(todayPrayers);
+        } else {
+          console.log('Notification permission denied');
+          Alert.alert(
+            'Permission required',
+            'Notification permission is required to receive alerts.',
+          );
+        }
+      });
+    }
+  };
+
+  const createNotificationChannel = () => {
+    console.log('Creating notification channel...');
+    PushNotification.createChannel(
+      {
+        channelId: 'prayer_reminder',
+        channelName: 'Prayer Alarm',
+        playSound: true,
+        soundName: 'azan.mp3',
+        importance: 4,
+        vibrate: true,
+      },
+      created => console.log(`Channel created successfully: ${created}`),
+    );
+  };
+
   const schedulePrayerNotifications = times => {
     if (!times) return;
 
@@ -154,17 +208,13 @@ const PrayerTimesScreen = () => {
 
         // Only schedule the alarm if the prayer time is in the future today
         if (alarmTime > now) {
-          // Cancel any previously scheduled notification for the same prayer
-          // PushNotification.cancelLocalNotifications({id: prayerLabels[index]});
-
-          // Schedule the new notification
           PushNotification.localNotificationSchedule({
             id: prayerLabels[index], // Use a unique id for each prayer
             channelId: 'prayer_reminder',
-            message: `It's time for ${prayerLabels[index]} prayer!`,
+            message: `${prayerLabels[index]} prayer!`,
             date: alarmTime,
             playSound: true,
-            soundName: 'alarm_sound.mp3',
+            soundName: 'azan.mp3',
             allowWhileIdle: true,
             priority: 'max',
             importance: 'high',
@@ -228,7 +278,9 @@ const PrayerTimesScreen = () => {
       <View style={CommonStyles.container}>
         <View style={styles.mainCard2}>
           <View style={{justifyContent: 'space-between', flex: 1}}>
-            <Text style={styles.mosqueTitle} ellipsizeMode='tail'>{appName}</Text>
+            <Text style={styles.mosqueTitle} ellipsizeMode="tail">
+              {appName}
+            </Text>
             <View>
               <Text style={styles.prayerItemTitle}>
                 Next: {upcomingPrayer?.name || ''}
@@ -264,10 +316,12 @@ const PrayerTimesScreen = () => {
               flexDirection: 'row',
               justifyContent: 'center',
               alignItems: 'center',
-              gap:10
+              gap: 10,
             }}>
-            <Pressable onPress={showDatePicker} style={{flexDirection:'row',gap:5}}>
-            <Text style={styles.dateText}>{selectedDate}</Text>
+            <Pressable
+              onPress={showDatePicker}
+              style={{flexDirection: 'row', gap: 5}}>
+              <Text style={styles.dateText}>{selectedDate}</Text>
               <Icons.AntDesign
                 name="caretdown"
                 size={20}
@@ -275,22 +329,21 @@ const PrayerTimesScreen = () => {
               />
             </Pressable>
             {!isToday && (
-          <Pressable onPress={refreshToToday}>
-            <Icons.MaterialCommunityIcons
-              name="refresh"
-              size={22}
-              color={colors.teal}
-            />
-          </Pressable>
-        )}
-
+              <Pressable onPress={refreshToToday}>
+                <Icons.MaterialCommunityIcons
+                  name="refresh"
+                  size={22}
+                  color={colors.teal}
+                />
+              </Pressable>
+            )}
           </View>
 
           {isDatePickerVisible && (
             <DateTimePicker
               value={date}
               mode="date"
-              minimumDate={new Date(2024, 0, 1)}  // January is month 0
+              minimumDate={new Date(2024, 0, 1)} // January is month 0
               maximumDate={new Date(2024, 11, 31)}
               display="default"
               onChange={handleDateChange}
@@ -298,7 +351,7 @@ const PrayerTimesScreen = () => {
           )}
         </View>
         {/* Refresh Icon */}
-        
+
         {/* Prayer Times */}
         <FlatList
           data={filteredPrayerTimes ? [filteredPrayerTimes] : []}
@@ -314,7 +367,7 @@ const PrayerTimesScreen = () => {
             </View>
           )}
           renderItem={({item}) => {
-            console.log(item);
+            // console.log(item);
 
             return (
               <>
@@ -544,8 +597,7 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontFamily: fonts.semibold,
     marginBottom: 14,
-    width:'80%',
-    
+    width: '80%',
   },
   prayerItemTitle: {
     fontSize: 14,
@@ -566,4 +618,4 @@ const styles = StyleSheet.create({
   image: {height: '100%', width: '100%', resizeMode: 'cover'},
 });
 
-export default PrayerTimesScreen;
+export default PrayerTimesScreen; 

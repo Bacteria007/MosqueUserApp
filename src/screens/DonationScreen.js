@@ -19,7 +19,7 @@ import DonationTextinput from '../components/inputs/DonationTextinput';
 import GradientButton from '../components/buttons/GradientButton';
 import MyImages from '../assets/images/MyImages';
 import {Icons} from '../assets/icons/Icons';
-import MyTextInput from '../components/inputs/MyTextInput';
+import AuthTextinput from '../components/inputs/AuthTextinput';
 import ReactNativeModal from 'react-native-modal';
 
 const DonationScreen = () => {

@@ -1,6 +1,5 @@
 import React, {useEffect} from 'react';
 import {Image, View, StyleSheet, Text} from 'react-native';
-import MyImages from '../assets/images/MyImages';
 import {useNavigation} from '@react-navigation/native';
 import WhiteStatusbar from '../components/statusbar/WhiteStatusbar';
 import CommonStyles from '../assets/styles/CommonStyles';
@@ -8,7 +7,8 @@ import fonts from '../assets/fonts/MyFonts';
 import colors from '../assets/colors/AppColors';
 import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
 import LottieView from 'lottie-react-native';
-import { appName } from '../services/constants';
+import {appName} from '../services/constants';
+import MyImages from '../assets/images/MyImages';
 
 const SplashScreen = () => {
   const navigation = useNavigation();
@@ -25,7 +25,11 @@ const SplashScreen = () => {
 
   return (
     <View style={styles.container}>
-      <WhiteStatusbar />
+      <TransparentStatusbar />
+      <Image
+        source={MyImages.masjid}
+        style={{height: '70%', width: '100%', resizeMode: 'cover'}}
+      />
       <View style={styles.centerContainer}>
         <Text style={styles.appName}>{appName}</Text>
         <Text style={styles.bottomLine}>{bottomLine}</Text>
@@ -57,7 +61,8 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontFamily: fonts.bold,
     color: colors.white,
-    width:'60%'
+    width: '60%',
+    textAlign: 'center',
   },
   bottomLine: {
     fontSize: 14,
@@ -75,20 +80,20 @@ const styles = StyleSheet.create({
   },
 });
 
-  // <View style={CommonStyles.container}>
-    //   <WhiteStatusbar />
-    //   <Image
-    //     source={MyImages.masjid}
-    //     style={{height: '70%', width: '100%', resizeMode: 'cover'}}
-    //   />
-    //   <View style={styles.bottomContainer}>
-    //     <Text style={styles.appName}>{appName}</Text>
-    //     <Text style={styles.bottomLine}>{bottomLine}</Text>
-    //     <LottieView
-    //       style={{height: 80, width: 80}}
-    //       source={MyImages.loading1}
-    //       autoPlay
-    //       loop={true}
-    //     />
-    //   </View>
-    // </View>
+// <View style={CommonStyles.container}>
+//   <WhiteStatusbar />
+//   <Image
+//     source={MyImages.masjid}
+//     style={{height: '70%', width: '100%', resizeMode: 'cover'}}
+//   />
+//   <View style={styles.bottomContainer}>
+//     <Text style={styles.appName}>{appName}</Text>
+//     <Text style={styles.bottomLine}>{bottomLine}</Text>
+//     <LottieView
+//       style={{height: 80, width: 80}}
+//       source={MyImages.loading1}
+//       autoPlay
+//       loop={true}
+//     />
+//   </View>
+// </View>

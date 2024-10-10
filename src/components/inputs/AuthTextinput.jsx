@@ -3,7 +3,7 @@ import React from 'react';
 import fonts from '../../assets/fonts/MyFonts';
 import colors from '../../assets/colors/AppColors';
 
-const MyTextInput = ({
+const AuthTextinput = ({
     placeholder,
     state,
     setState,
@@ -25,7 +25,7 @@ const MyTextInput = ({
     );
 };
 
-export default MyTextInput;
+export default AuthTextinput;
 
 const styles = StyleSheet.create({
     inputStyle: {

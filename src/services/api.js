@@ -39,7 +39,7 @@ export default async function ApiService({ method = 'GET', url = '', data = {}, 
 
     // Make API call
     const response = await api(options);
-    console.log('API Response:', response.data);
+    // console.log('API Response:', response.data);
     if(response.data.status){
       return response.data;
     }
