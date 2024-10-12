@@ -26,8 +26,13 @@ import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
 import MyImages from '../assets/images/MyImages';
 import WhiteStatusbar from '../components/statusbar/WhiteStatusbar';
 import PrimaryButton from '../components/buttons/PrimaryButton';
+import Toast from 'react-native-toast-message';
 
 const SignupScreen = ({navigation}) => {
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.,#^])[A-Za-z\d@$!%*?&.,#^]{8,}$/;
+
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
@@ -42,10 +47,23 @@ const SignupScreen = ({navigation}) => {
       setNameError('Please enter your name');
       return;
     }
+    setEmailError('');
+    setPasswordError('');
+
     if (email == '') {
       setEmailError('Please enter email');
       return;
     }
+    if (!emailRegex.test(email)) {
+      setEmailError('Please enter a valid email');
+      return;
+    }
+    // if (!passwordRegex.test(password)) {
+    //   setPasswordError(
+    //     'Password must contain at least 8 characters, one uppercase letter, one number, and one special character [@, $, !, %, *, ?, &, ., #, ^].',
+    //   );
+    //   return;
+    // }
     if (password == '') {
       setPasswordError('Please enter password');
       return;
@@ -56,22 +74,23 @@ const SignupScreen = ({navigation}) => {
     console.log(signupResult.type);
 
     if (signupResult.type == '/auth/register/rejected') {
-      Alert.alert('Signup failed');
     } else {
-      console.log('Signup success');
+      setEmail('')
+      setPassword('')
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'MainNavigator'}],
+      });
+      console.log('Login success');
     }
   };
 
   return (
     <View style={styles.container}>
       <TransparentStatusbar />
-      {/* <View style={CommonStyles.authHeader}>
-        <Text style={CommonStyles.authTitle}>Sign Up</Text>
-        <Text style={CommonStyles.authSubtitle}>Create Account!</Text>
-      </View> */}
-       <Image
+      <Image
         source={MyImages.masjid}
-        style={{height: '60%', width: '100%', resizeMode: 'cover'}}
+        style={{height: '30%', width: '100%', resizeMode: 'cover'}}
       />
       <View style={CommonStyles.authBottomConatiner}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -82,7 +101,6 @@ const SignupScreen = ({navigation}) => {
             autoCapitalize="none"
           />
           {nameError && <Text style={CommonStyles.errorText}>{nameError}</Text>}
-
           <AuthTextinput
             placeholder="Email"
             state={email}
@@ -93,7 +111,6 @@ const SignupScreen = ({navigation}) => {
           {emailError && (
             <Text style={CommonStyles.errorText}>{emailError}</Text>
           )}
-
           <AuthTextinput
             placeholder="Password"
             state={password}
@@ -104,15 +121,12 @@ const SignupScreen = ({navigation}) => {
           {passwordError && (
             <Text style={CommonStyles.errorText}>{passwordError}</Text>
           )}
-
           {signupError && <Text style={styles.errorText}>{signupError}</Text>}
-
           <PrimaryButton
             title="Sign up"
             onPress={handleSignup}
             loader={loading}
           />
-          {/* Footer section for Login link */}
           <View style={CommonStyles.authFooter}>
             <Text
               style={styles.login_link}
@@ -149,14 +163,14 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bold,
   },
   login_link: {
-    color: colors.primary,
+    color: colors.black,
     textAlign: 'center',
     fontSize: 12,
     fontFamily: fonts.normal,
   },
   bold: {
+    color: colors.primary,
     fontFamily: fonts.bold,
-    textDecorationLine: 'underline',
   },
 });
 

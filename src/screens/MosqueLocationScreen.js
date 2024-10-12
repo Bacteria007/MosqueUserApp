@@ -20,13 +20,12 @@ const mosqueLocation = {
   longitude: 74.1923,
 };
 
-const GOOGLE_MAPS_APIKEY = 'AIzaSyDjUQi1vqjc1j5AbFBIyvy_zXl8qoqwXGo'; // Replace with your Google Maps API key
-
+const GOOGLE_MAPS_APIKEY = 'AIzaSyDjUQi1vqjc1j5AbFBIyvy_zXl8qoqwXGo'; 
 const MosqueLocationScreen = () => {
   const [currentLocation, setCurrentLocation] = useState(null);
   const [routeCoords, setRouteCoords] = useState([]);
-  const [estimatedTime, setEstimatedTime] = useState(''); // State for estimated time
-
+  const [estimatedTime, setEstimatedTime] = useState('');
+  
   useEffect(() => {
     const requestLocationPermission = async () => {
       try {

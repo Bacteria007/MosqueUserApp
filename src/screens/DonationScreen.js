@@ -3,24 +3,20 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   Pressable,
-  Modal,
   TextInput,
   Image,
   ScrollView,
 } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
 import CommonStyles from '../assets/styles/CommonStyles';
 import MainScreensHeader from '../components/headers/MainScreensHeader';
 import colors from '../assets/colors/AppColors';
 import fonts from '../assets/fonts/MyFonts';
 import DonationTextinput from '../components/inputs/DonationTextinput';
-import GradientButton from '../components/buttons/GradientButton';
 import MyImages from '../assets/images/MyImages';
 import {Icons} from '../assets/icons/Icons';
-import AuthTextinput from '../components/inputs/AuthTextinput';
 import ReactNativeModal from 'react-native-modal';
+import PrimaryButton from '../components/buttons/PrimaryButton';
 
 const DonationScreen = () => {
   const inputsGap = 20;
@@ -213,18 +209,14 @@ const DonationScreen = () => {
 
           {/* Back and Donate Now buttons at the bottom */}
           <View style={styles.bottomButtonsContainer}>
-            <Pressable
-              style={styles.backBtn}
-              onPress={() => setStep(1)}>
-              <Text style={[styles.buttonText,{color:colors.black}]}>Back</Text>
+            <Pressable style={styles.backBtn} onPress={() => setStep(1)}>
+              <Text style={[styles.buttonText, {color: colors.black}]}>
+                Back
+              </Text>
             </Pressable>
-            <Pressable
-              style={styles.donateBtn}
-              onPress={handleDonateNow}>
+            <Pressable style={styles.donateBtn} onPress={handleDonateNow}>
               <Text style={styles.buttonText}>Donate</Text>
             </Pressable>
-            {/* <GradientButton onPress={() => setStep(1)} title="Back" />
-            <GradientButton onPress={handleDonateNow} title="Donate Now" /> */}
           </View>
         </ScrollView>
       )}
@@ -259,7 +251,7 @@ const DonationScreen = () => {
               onChangeText={setCustomAmount}
               placeholderTextColor={colors.white}
             />
-            <GradientButton title={'OK'} onPress={closeDonationModal} />
+            <PrimaryButton title={'OK'} onPress={closeDonationModal} />
           </View>
         </View>
       </ReactNativeModal>
@@ -320,25 +312,25 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     borderRadius: 10,
     paddingVertical: 8,
-    width:'100%'
+    width: '100%',
   },
-  backBtn:{
+  backBtn: {
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.white,
     borderRadius: 10,
-    borderWidth:1.5,
-    borderColor:colors.primary,
+    borderWidth: 1.5,
+    borderColor: colors.primary,
     paddingVertical: 8,
-    width:'30%'
+    width: '30%',
   },
-  donateBtn:{
+  donateBtn: {
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.primary,
     borderRadius: 10,
     paddingVertical: 8,
-    width:'30%'
+    width: '30%',
   },
 
   buttonText: {

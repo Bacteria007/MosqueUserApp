@@ -36,30 +36,17 @@ const ResetPasswordScreen = ({navigation}) => {
     setLoading(true);
     try {
       const response = await api.post('/auth/reset-password', {email});
-      Alert.alert(
-        'Success',
-        response.data.message || 'Check your email for reset instructions.',
-      );
       navigation.navigate('Login');
-    } catch (error) {
-      Alert.alert(
-        'Error',
-        error.response?.data?.message || 'An error occurred.',
-      );
-    }
+    } catch (error) {}
     setLoading(false);
   };
 
   return (
     <View style={styles.container}>
       <TransparentStatusbar />
-      {/* <View style={CommonStyles.authHeader}>
-        <Text style={CommonStyles.authTitle}>Reset Password</Text>
-        <Text style={CommonStyles.authSubtitle}>Reset Your password!</Text>
-      </View> */}
-       <Image
+      <Image
         source={MyImages.masjid}
-        style={{height: '60%', width: '100%', resizeMode: 'cover'}}
+        style={{height: '30%', width: '100%', resizeMode: 'cover'}}
       />
       <View style={CommonStyles.authBottomConatiner}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -80,7 +67,6 @@ const ResetPasswordScreen = ({navigation}) => {
             onPress={() => handleResetPassword()}
             loader={loading}
           />
-          {/* Back to Login link at the bottom */}
           <View style={CommonStyles.authFooter}>
             <Text
               style={styles.login_link}
@@ -111,14 +97,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   login_link: {
-    color: colors.primary,
+    color: colors.black,
     textAlign: 'center',
     fontSize: 12,
     fontFamily: fonts.normal,
   },
   bold: {
+    color: colors.primary,
     fontFamily: fonts.bold,
-    textDecorationLine: 'underline',
   },
 });
 

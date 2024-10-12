@@ -57,7 +57,7 @@ const CommonStyles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   authBottomConatiner: {
-    marginTop: 20,
+    marginTop: 30,
     paddingHorizontal: 16,
     width: '100%',
     flex: 1,

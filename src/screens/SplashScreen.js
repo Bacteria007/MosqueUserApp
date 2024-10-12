@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Image, View, StyleSheet, Text} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import WhiteStatusbar from '../components/statusbar/WhiteStatusbar';
@@ -9,15 +9,40 @@ import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
 import LottieView from 'lottie-react-native';
 import {appName} from '../services/constants';
 import MyImages from '../assets/images/MyImages';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SplashScreen = () => {
   const navigation = useNavigation();
-  const bottomLine = 'Stay Connected with Your Faith';
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const checkIsLoggedIn = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      console.log('=token==', token);
+
+      if (token) {
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'MainNavigator'}],
+        });
+      } else {
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'AuthNavigator', params: {screen: 'Login'}}],
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      setIsLoggedIn(false);
+    }
+  };
+  useEffect(() => {
+    checkIsLoggedIn();
+  }, [isLoggedIn]);
+
   useEffect(() => {
     // Set a timeout of 2 seconds before navigating to the Login screen
-    const timer = setTimeout(() => {
-      navigation.navigate('Login');
-    }, 3000);
+    const timer = setTimeout(() => {}, 3000);
 
     // Cleanup the timer if the component is unmounted
     return () => clearTimeout(timer);
@@ -27,17 +52,17 @@ const SplashScreen = () => {
     <View style={styles.container}>
       <TransparentStatusbar />
       <Image
-        source={MyImages.masjid}
-        style={{height: '70%', width: '100%', resizeMode: 'cover'}}
+        source={MyImages.logo}
+        style={{height: '50%', width: '50%', resizeMode: 'contain'}}
       />
-      <View style={styles.centerContainer}>
+      {/* <View style={styles.centerContainer}>
         <Text style={styles.appName}>{appName}</Text>
         <Text style={styles.bottomLine}>{bottomLine}</Text>
-      </View>
+      </View> */}
       <View style={styles.lottieContainer}>
         <LottieView
           style={styles.lottie}
-          source={MyImages.loading1}
+          source={MyImages.loading2}
           autoPlay
           loop={true}
         />
@@ -50,28 +75,32 @@ export default SplashScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.bg_clr,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   centerContainer: {
-    flex: 1,
+    // flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
   appName: {
-    fontSize: 22,
+    fontSize: 16,
     fontFamily: fonts.bold,
-    color: colors.white,
+    color: colors.black,
     width: '60%',
     textAlign: 'center',
   },
   bottomLine: {
     fontSize: 14,
     fontFamily: fonts.normal,
-    color: colors.white,
+    color: colors.black,
   },
   lottieContainer: {
     justifyContent: 'flex-end',
+    position: 'absolute',
     alignItems: 'center',
+    bottom: 0,
     paddingBottom: 20, // Adjust to move the Lottie animation slightly up if necessary
   },
   lottie: {

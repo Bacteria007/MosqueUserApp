@@ -14,6 +14,6 @@ const colors = {
   forground_clr: '#14a6db',
   forground_txt: '#000',
   light_white: '#E2E2E270',
-  light_black:'rgba(0, 0, 0, 0.6)'
+  light_black:'rgba(0, 0, 0, 0.4)'
 };
 export default colors;

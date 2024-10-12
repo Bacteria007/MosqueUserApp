@@ -1,20 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {
-  View,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Text,
-  ActivityIndicator,
-  Alert,
-  StatusBar,
-  Image,
-  Pressable,
-  ScrollView,
-  KeyboardAvoidingView,
-  Keyboard,
-  Platform,
-} from 'react-native';
+import {View, StyleSheet, Text, Image, ScrollView} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {login} from '../reducers/authSlice';
 import colors from '../assets/colors/AppColors';
@@ -24,76 +9,67 @@ import CommonStyles from '../assets/styles/CommonStyles';
 import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
 import AuthTextinput from '../components/inputs/AuthTextinput';
 import PrimaryButton from '../components/buttons/PrimaryButton';
-import {Icons} from '../assets/icons/Icons';
 import {useNavigation} from '@react-navigation/native';
-import {LoginManager, AccessToken, Settings} from 'react-native-fbsdk-next';
+import Toast from 'react-native-toast-message';
 
 const LoginScreen = () => {
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.,#^])[A-Za-z\d@$!%*?&.,#^]{8,}$/;
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
   const {loading, loginError} = useSelector(state => state.auth);
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const [isKeyboardVisible, setKeyboardVisible] = useState(false);
   const navigation = useNavigation();
 
-  useEffect(() => {
-    Settings.initializeSDK();
-  }, []);
-
   const handleLogin = async () => {
+    setEmailError('');
+    setPasswordError('');
+
     if (email == '') {
       setEmailError('Please enter email');
       return;
     }
+    if (!emailRegex.test(email)) {
+      setEmailError('Please enter a valid email');
+      return;
+    }
+    // if (!passwordRegex.test(password)) {
+    //   setPasswordError(
+    //     'Password must contain at least 8 characters, one uppercase letter, one number, and one special character [@, $, !, %, *, ?, &, ., #, ^].',
+    //   );
+    //   return;
+    // }
     if (password == '') {
       setPasswordError('Please enter password');
       return;
     }
+
     const loginResult = await dispatch(login({email, password}));
     console.log('login=====', loginResult.type);
 
     if (loginResult.type == 'auth/login/rejected') {
-      Alert.alert('Login failed');
+      console.log('Login failed'); // Log the failure
     } else {
-      // Navigate to next screen
+      setEmail('')
+      setPassword('')
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'MainNavigator'}],
+      });
       console.log('Login success');
-      // navigation.navigate('Prayer Times');
     }
   };
-  const handleFacebookLogin = async () => {
-    try {
-      const result = await LoginManager.logInWithPermissions([
-        'public_profile',
-        'email',
-      ]);
-      if (result.isCancelled) {
-        console.log('Login cancelled');
-      } else {
-        const data = await AccessToken.getCurrentAccessToken();
-        if (data) {
-          console.log(
-            'Facebook Access Token:==>>>> ',
-            data.accessToken.toString(),
-          );
-        }
-      }
-    } catch (error) {
-      console.error('Facebook Login fail with error: ', error);
-    }
-  };
+
   return (
     <View style={styles.container}>
       <TransparentStatusbar />
-      {/* <View style={CommonStyles.authHeader}>
-        <Text style={CommonStyles.authTitle}>Login</Text>
-        <Text style={CommonStyles.authSubtitle}>Welcome Back!</Text>
-      </View> */}
-       
-        <Image
+      <Image
         source={MyImages.masjid}
-        style={{height: '60%', width: '100%', resizeMode: 'cover'}}
+        style={{height: '30%', width: '100%', resizeMode: 'cover'}}
       />
       <View style={CommonStyles.authBottomConatiner}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -137,31 +113,6 @@ const LoginScreen = () => {
               onPress={() => navigation.navigate('Signup')}>
               Don't have an account? <Text style={styles.bold}>Sign Up</Text>
             </Text>
-
-            {/* <View style={styles.socialButtons}>
-              <Pressable
-                style={[
-                  styles.googleBtn,
-                  {backgroundColor: colors.primaryLight},
-                ]}>
-                <Image
-                  source={MyImages.google}
-                  style={{height: 20, width: 20}}
-                />
-              </Pressable>
-              <Pressable
-                onPress={handleFacebookLogin}
-                style={[
-                  styles.googleBtn,
-                  {backgroundColor: colors.primaryLight},
-                ]}>
-                <Icons.FontAwesome
-                  name={'facebook'}
-                  size={20}
-                  color={colors.blue}
-                />
-              </Pressable>
-            </View> */}
           </View>
         </ScrollView>
       </View>
@@ -177,15 +128,12 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    // justifyContent: 'center',
-    // marginTop:60,
-    // width: '100%',
   },
   footer: {
     padding: 20,
     backgroundColor: colors.bg_clr,
     alignItems: 'center',
-    justifyContent: 'flex-end', // Ensures content sticks to the bottom
+    justifyContent: 'flex-end',
   },
   forgot_link: {
     color: colors.primary,
@@ -197,28 +145,14 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   signup_link: {
-    color: colors.primary,
+    color: colors.black,
     textAlign: 'center',
     fontSize: 12,
     fontFamily: fonts.normal,
   },
   bold: {
+    color: colors.primary,
     fontFamily: fonts.bold,
-    textDecorationLine: 'underline',
-  },
-  socialButtons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 12,
-    marginTop: 10,
-  },
-  googleBtn: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 99,
   },
 });
 
