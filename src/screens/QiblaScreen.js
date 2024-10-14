@@ -20,6 +20,9 @@ import MainScreensHeader from '../components/headers/MainScreensHeader';
 import {Icons} from '../assets/icons/Icons';
 import MyHeader from '../components/headers/MyHeader';
 import WhiteStatusbar from '../components/statusbar/WhiteStatusbar';
+import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
+import LinearGradient from 'react-native-linear-gradient';
+import AppHeader from '../components/headers/AppHeader';
 
 const QiblaScreen = () => {
   const [heading, setHeading] = useState(0);
@@ -102,42 +105,53 @@ const QiblaScreen = () => {
 
   return (
     <ScreenWrapper refreshAct={() => getCurrentLocation()}>
-     <WhiteStatusbar/>
+      <TransparentStatusbar />
+      <AppHeader/>
       <View style={CommonStyles.container}>
-        <MainScreensHeader
-          title={'Qibla Direction'}
-          subTitle={'Stay Connected with Your Faith'}
-        />
-        {/* Compass Visualization with Card Background */}
-        <View style={{flex:1,justifyContent:'space-around',alignItems:'center',}}>
-        <View style={styles.compassContainer}>
-          <Image
-            source={MyImages.degree_circle}
-            style={styles.compassBackground}
+          <MainScreensHeader
+            title={`${qiblaDirection.toFixed(2)}°`}
+            subTitle={'Qibla Direction'}
           />
-          <Animated.Image
-            source={MyImages.needle_msjid}
-            style={[styles.needle, {transform: [{rotate: rotateInterpolate}]}]}
-          />
-        </View>
+          {/* Compass Visualization with Card Background */}
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'space-around',
+              alignItems: 'center',
+            }}>
+            <View style={styles.compassContainer}>
+              <Image
+                source={MyImages.degree_circle}
+                style={styles.compassBackground}
+              />
+              <Animated.Image
+                source={MyImages.needle_msjid}
+                style={[
+                  styles.needle,
+                  {transform: [{rotate: rotateInterpolate}]},
+                ]}
+              />
+            </View>
 
-        {/* Text and Qibla Information in a Card */}
-        <View style={styles.infoCard}>
-          {/* <Text style={styles.infoText}>Heading: {heading.toFixed(2)}°</Text> */}
-          <Icons.MaterialCommunityIcons
-            name="compass"
-            size={20}
-            color={colors.teal}
-          />
-          <Text style={styles.infoText}>
-            Qibla Direction: {qiblaDirection.toFixed(2)}°
-          </Text>
-          {/* <Text style={styles.infoText}>
+            {/* Text and Qibla Information in a Card */}
+            <View style={styles.infoCard}>
+              {/* <Text style={styles.infoText}>Heading: {heading.toFixed(2)}°</Text> */}
+              <Icons.MaterialCommunityIcons
+                name="compass"
+                size={20}
+                color={colors.teal}
+              />
+              <Text style={styles.infoText}>
+                Qibla Direction: {qiblaDirection.toFixed(2)}°
+              </Text>
+            </View>
+            {/* <Text style={styles.infoText}>Heading: {heading.toFixed(2)}°</Text>
+             */}
+            {/* <Text style={styles.infoText}>
             Rotate: {(qiblaDirection - heading).toFixed(2)}° to face Qibla
           </Text> */}
+          </View>
         </View>
-      </View>
-      </View>
     </ScreenWrapper>
   );
 };
@@ -149,6 +163,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.bg_clr,
   },
+  
   compassCard: {
     width: 260,
     height: 260,
@@ -164,7 +179,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4.65,
     // Android elevation
     elevation: 8,
-    borderRadius:999
+    borderRadius: 999,
   },
   compassContainer: {
     width: 260,
@@ -175,18 +190,18 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     backgroundColor: colors.white,
     // iOS shadow
-    shadowColor: colors.primary,
+    shadowColor: colors.white,
     shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.3,
     shadowRadius: 4.65,
     // Android elevation
     elevation: 8,
-    borderRadius:999
+    borderRadius: 999,
   },
   compassBackground: {
     width: 230,
     height: 230,
-    borderRadius:999
+    borderRadius: 999,
   },
   needle: {
     width: 120,
@@ -202,10 +217,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     position: 'absolute',
-
   },
   infoText: {
-
     color: colors.black,
     fontSize: 12,
     fontFamily: fonts.medium,

@@ -7,7 +7,8 @@ import AppNavigator from './src/navigation/AppNavigator';
 import store from './src/store/store';
 import {STRIPE_PUBLISHABLE_KEY} from '@env';
 import {LogBox, Platform, PermissionsAndroid, Alert} from 'react-native';
-import Toast from 'react-native-toast-message'
+import Toast from 'react-native-toast-message';
+
 LogBox.ignoreAllLogs(true);
 
 const App = () => {
@@ -16,16 +17,13 @@ const App = () => {
     PushNotification.configure({
       onNotification: function (notification) {
         console.log('NOTIFICATION RECEIVED:', notification);
-        // process the notification
       },
       requestPermissions: Platform.OS === 'ios',
     });
 
-    // Request notification permission and create channel
     requestNotificationPermission();
   }, []);
 
-  // Function to request notification permission and create channel
   const requestNotificationPermission = async () => {
     if (Platform.OS === 'android' && Platform.Version >= 33) {
       try {
@@ -41,13 +39,11 @@ const App = () => {
         );
         if (granted === PermissionsAndroid.RESULTS.GRANTED) {
           console.log('Notification permission granted');
-          // Create notification channel for Android
-          createNotificationChannel();
         } else {
           console.log('Notification permission denied');
           Alert.alert(
             'Permission required',
-            'Notification permission is required to receive prayer alarms.',
+            'Notification permission is required to receive notifications.',
           );
         }
       } catch (err) {
@@ -57,8 +53,7 @@ const App = () => {
       PushNotification.requestPermissions().then(permission => {
         if (permission.alert || permission.sound || permission.badge) {
           console.log('Notification permission granted');
-          // Create notification channel for iOS
-          createNotificationChannel();
+   
         } else {
           console.log('Notification permission denied');
           Alert.alert(
@@ -70,27 +65,12 @@ const App = () => {
     }
   };
 
-  const createNotificationChannel = () => {
-    console.log('Creating notification channel...');
-    PushNotification.createChannel(
-      {
-        channelId: 'prayer_reminder',
-        channelName: 'Prayer Alarm',
-        playSound: true,
-        soundName: 'azan.mp3', 
-        importance: 4,
-        vibrate: true,
-      },
-      created => console.log(`Channel created : ${created}`),
-    );
-  };
-
   return (
     <Provider store={store}>
       <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
         <NavigationContainer>
           <AppNavigator />
-          <Toast ref={(ref) => Toast.setRef(ref)} />
+          <Toast />
         </NavigationContainer>
       </StripeProvider>
     </Provider>

@@ -1,7 +1,7 @@
 const colors = {
   white: '#fff',
   blue: '#1974ec',
-  primary: '#009a9a',
+  primary: '#006665',
   teal: '#009a9a',
   black: 'black',
   secondary: '#FCA625',
@@ -14,6 +14,11 @@ const colors = {
   forground_clr: '#14a6db',
   forground_txt: '#000',
   light_white: '#E2E2E270',
-  light_black:'rgba(0, 0, 0, 0.4)'
+  light_black:'rgba(0, 0, 0, 0.4)',
+  img3:'#147985',
+  img1:'#1b879f',
+  img4:'#042334',
+  img2:'#006665',
+  img5:'#044154',
 };
 export default colors;

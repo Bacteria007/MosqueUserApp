@@ -11,6 +11,7 @@ import AuthTextinput from '../components/inputs/AuthTextinput';
 import PrimaryButton from '../components/buttons/PrimaryButton';
 import {useNavigation} from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
+import AuthHeader from '../components/headers/AuthHeader';
 
 const LoginScreen = () => {
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -66,11 +67,8 @@ const LoginScreen = () => {
 
   return (
     <View style={styles.container}>
-      <TransparentStatusbar />
-      <Image
-        source={MyImages.masjid}
-        style={{height: '30%', width: '100%', resizeMode: 'cover'}}
-      />
+            <AuthHeader/>
+
       <View style={CommonStyles.authBottomConatiner}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <AuthTextinput
@@ -123,7 +121,7 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.bg_clr,
+    backgroundColor: colors.img4,
     justifyContent: 'center',
   },
   scrollContainer: {
@@ -136,23 +134,23 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   forgot_link: {
-    color: colors.primary,
+    color: colors.img1,
     marginBottom: 5,
     textAlign: 'right',
-    fontSize: 12,
+    fontSize: 14,
     marginRight: 8,
-    fontFamily: fonts.normal,
-    textDecorationLine: 'underline',
+    fontFamily: fonts.medium,
   },
   signup_link: {
-    color: colors.black,
+    color: colors.white,
     textAlign: 'center',
     fontSize: 12,
     fontFamily: fonts.normal,
   },
   bold: {
-    color: colors.primary,
-    fontFamily: fonts.bold,
+    fontSize: 14,
+    color: colors.img1,
+    fontFamily: fonts.medium,
   },
 });
 

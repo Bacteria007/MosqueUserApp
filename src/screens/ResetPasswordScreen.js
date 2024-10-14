@@ -22,6 +22,7 @@ import colors from '../assets/colors/AppColors';
 import fonts from '../assets/fonts/MyFonts';
 import WhiteStatusbar from '../components/statusbar/WhiteStatusbar';
 import PrimaryButton from '../components/buttons/PrimaryButton';
+import AuthHeader from '../components/headers/AuthHeader';
 
 const ResetPasswordScreen = ({navigation}) => {
   const [email, setEmail] = useState('');
@@ -43,11 +44,8 @@ const ResetPasswordScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <TransparentStatusbar />
-      <Image
-        source={MyImages.masjid}
-        style={{height: '30%', width: '100%', resizeMode: 'cover'}}
-      />
+           <AuthHeader/>
+
       <View style={CommonStyles.authBottomConatiner}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <AuthTextinput
@@ -63,7 +61,7 @@ const ResetPasswordScreen = ({navigation}) => {
           )}
 
           <PrimaryButton
-            title="Reset Password"
+            title="Reset"
             onPress={() => handleResetPassword()}
             loader={loading}
           />
@@ -83,7 +81,7 @@ const ResetPasswordScreen = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.bg_clr,
+    backgroundColor: colors.img4,
   },
   scrollContainer: {
     flexGrow: 1,
@@ -97,13 +95,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   login_link: {
-    color: colors.black,
+    color: colors.white,
     textAlign: 'center',
     fontSize: 12,
     fontFamily: fonts.normal,
   },
   bold: {
-    color: colors.primary,
+    fontSize: 14,
+    color: colors.img1,
     fontFamily: fonts.bold,
   },
 });

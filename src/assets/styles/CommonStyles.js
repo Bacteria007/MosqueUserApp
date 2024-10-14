@@ -5,7 +5,7 @@ import fonts from '../fonts/MyFonts';
 const CommonStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.bg_clr,
+    backgroundColor: colors.white,
   },
   centerContentContainer: {
     flex: 1,

@@ -18,6 +18,9 @@ import {
 } from '../utils/PrayerRemiders';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
+import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
+import WhiteStatusbar from '../components/statusbar/WhiteStatusbar';
+import AppHeader from '../components/headers/AppHeader';
 
 const SettingsScreen = () => {
   const [isReminderEnabled, setIsReminderEnabled] = useState(false);
@@ -36,7 +39,7 @@ const SettingsScreen = () => {
     };
 
     fetchRingerMode();
-    createNotificationChannel(todayPrayers);
+    // createNotificationChannel(todayPrayers);
   }, []);
 
   const requestDoNotDisturbPermission = async () => {
@@ -78,7 +81,7 @@ const SettingsScreen = () => {
     setIsReminderEnabled(value);
     if (value) {
       // Call function to schedule notifications
-      schedulePrayerNotifications(todayPrayers);
+      // schedulePrayerNotifications(todayPrayers);
     } else {
       cancelAllNotifications();
     }
@@ -99,6 +102,9 @@ const SettingsScreen = () => {
 
   return (
     <View style={CommonStyles.container}>
+      <TransparentStatusbar />
+      <AppHeader />
+
       <MainScreensHeader title={'Settings'} />
       <View style={[CommonStyles.authBottomConatiner, {marginTop: 20}]}>
         <View style={styles.alarmContainer}>

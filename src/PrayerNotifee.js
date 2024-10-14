@@ -1,6 +1,5 @@
 import notifee, { TimestampTrigger, TriggerType } from '@notifee/react-native';
 
-// Create a notification channel
 export const createNotificationChannel = async () => {
   const channelId = await notifee.createChannel({
     id: 'prayer_reminder',
@@ -11,7 +10,6 @@ export const createNotificationChannel = async () => {
   return channelId;
 };
 
-// Schedule prayer notifications based on today's remaining prayer times
 export const schedulePrayerNotifications = async (remainingPrayers = []) => {
   if (!Array.isArray(remainingPrayers) || remainingPrayers.length === 0) {
     console.log('No remaining prayers to schedule notifications for.');
@@ -20,7 +18,7 @@ export const schedulePrayerNotifications = async (remainingPrayers = []) => {
 
   console.log('Scheduling notifications for the following prayers:', remainingPrayers);
 
-  const channelId = await createNotificationChannel(); // Create or get the notification channel
+  const channelId = await createNotificationChannel();
 
   remainingPrayers.forEach(async (prayer) => {
     const timeString = prayer.time;
@@ -29,11 +27,10 @@ export const schedulePrayerNotifications = async (remainingPrayers = []) => {
       const notificationTime = new Date();
       notificationTime.setHours(parseInt(hour), parseInt(minute), 0, 0);
 
-      // Ensure the notification time is in the future
       if (notificationTime > new Date()) {
-        const trigger: TimestampTrigger = {
+        const trigger = {
           type: TriggerType.TIMESTAMP,
-          timestamp: notificationTime.getTime(), // The time when the notification should appear
+          timestamp: notificationTime.getTime(),
         };
 
         await notifee.createTriggerNotification(
@@ -53,7 +50,6 @@ export const schedulePrayerNotifications = async (remainingPrayers = []) => {
   });
 };
 
-// Cancel all notifications
 export const cancelAllNotifications = async () => {
   await notifee.cancelAllNotifications();
   console.log('All notifications cancelled.');

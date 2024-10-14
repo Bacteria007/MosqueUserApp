@@ -27,6 +27,7 @@ import MyImages from '../assets/images/MyImages';
 import WhiteStatusbar from '../components/statusbar/WhiteStatusbar';
 import PrimaryButton from '../components/buttons/PrimaryButton';
 import Toast from 'react-native-toast-message';
+import AuthHeader from '../components/headers/AuthHeader';
 
 const SignupScreen = ({navigation}) => {
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -87,11 +88,7 @@ const SignupScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <TransparentStatusbar />
-      <Image
-        source={MyImages.masjid}
-        style={{height: '30%', width: '100%', resizeMode: 'cover'}}
-      />
+      <AuthHeader/>
       <View style={CommonStyles.authBottomConatiner}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <AuthTextinput
@@ -144,7 +141,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: colors.bg_clr,
+    backgroundColor: colors.img4,
   },
   scrollContainer: {
     flexGrow: 1,
@@ -163,13 +160,14 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bold,
   },
   login_link: {
-    color: colors.black,
+    color: colors.white,
     textAlign: 'center',
     fontSize: 12,
     fontFamily: fonts.normal,
   },
   bold: {
-    color: colors.primary,
+    color: colors.img1,
+    fontSize: 14,
     fontFamily: fonts.bold,
   },
 });

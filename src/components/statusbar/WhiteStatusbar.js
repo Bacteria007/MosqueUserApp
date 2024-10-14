@@ -1,7 +1,14 @@
-import { StatusBar } from 'react-native'
-import React from 'react'
-import colors from '../../assets/colors/AppColors'
+import { StatusBar } from 'react-native';
+import React from 'react';
 
-export default WhiteStatusbar = () => {
-    return <StatusBar backgroundColor={colors.primary} barStyle="light-content" />
-}
+const WhiteStatusbar = () => {
+  return (
+    <StatusBar
+      backgroundColor="transparent"
+      translucent 
+      barStyle="light-content"
+    />
+  );
+};
+
+export default WhiteStatusbar;

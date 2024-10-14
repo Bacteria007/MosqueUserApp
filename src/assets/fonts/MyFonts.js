@@ -1,7 +1,8 @@
 const fonts = {
-    normal: "Poppins-Regular",
-    bold: "Poppins-Bold",
-    semibold: "Poppins-SemiBold",
-    medium:"Poppins-Medium",
+    normal: "Inter-Regular",
+    bold: "Inter-Bold",
+    extrabold: "Inter-ExtraBold",
+    semibold: "Inter-SemiBold",
+    medium:"Inter-Medium",
 }
 export default fonts

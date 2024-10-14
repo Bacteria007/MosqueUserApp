@@ -11,7 +11,7 @@ import fonts from '../assets/fonts/MyFonts';
 import SettingsScreen from '../screens/SettingsScreen';
 
 const Tab = createBottomTabNavigator();
-const activeColor = colors.teal;
+const activeColor = colors.primary;
 const inactiveColor = colors.tab_inactive;
 const iconSize = 22;
 
@@ -26,11 +26,11 @@ const MainNavigator = () => (
         fontFamily: fonts.semibold,
       },
       tabBarItemStyle: {
-        backgroundColor: colors.bg_clr,
+        backgroundColor: colors.white,
       },
       tabBarStyle: {
-        height: 70,
-        borderTopColor:colors.primary,
+        height: 60,
+        // borderTopColor:colors.primary,
         borderTopWidth:0,
         shadowColor: colors.black,
         shadowOffset: {width: 0, height: 4},
@@ -90,9 +90,9 @@ const MainNavigator = () => (
         }
       },
     })}>
-    <Tab.Screen name="Prayer Times" component={PrayerTimesScreen} />
+    <Tab.Screen name="Prayer Times" options={{title:"Times"}} component={PrayerTimesScreen} />
     <Tab.Screen name="Qibla" component={QiblaScreen} />
-    <Tab.Screen name="Mosque Location" component={MosqueLocationScreen} />
+    <Tab.Screen name="Mosque Location" options={{title:"Location"}} component={MosqueLocationScreen} />
     <Tab.Screen name="Donate" component={DonationScreen} />
     <Tab.Screen name="Settings" component={SettingsScreen} />
   </Tab.Navigator>

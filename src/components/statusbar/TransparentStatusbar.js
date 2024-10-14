@@ -1,4 +1,4 @@
-import {StatusBar, StyleSheet, Text, View} from 'react-native';
+import {StatusBar} from 'react-native';
 import React from 'react';
 
 const TransparentStatusbar = () => {
@@ -6,11 +6,10 @@ const TransparentStatusbar = () => {
     <StatusBar
       backgroundColor={'transparent'}
       translucent
-      barStyle={'light-content'}
+      barStyle={'dark-content'}
+    
     />
   );
 };
 
 export default TransparentStatusbar;
-
-const styles = StyleSheet.create({});

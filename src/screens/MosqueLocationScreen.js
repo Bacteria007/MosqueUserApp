@@ -14,18 +14,21 @@ import MainScreensHeader from '../components/headers/MainScreensHeader';
 import MyImages from '../assets/images/MyImages';
 import axios from 'axios';
 import colors from '../assets/colors/AppColors';
+import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
+import WhiteStatusbar from '../components/statusbar/WhiteStatusbar';
+import AppHeader from '../components/headers/AppHeader';
 
 const mosqueLocation = {
-  latitude: 32.1120, 
+  latitude: 32.112,
   longitude: 74.1923,
 };
 
-const GOOGLE_MAPS_APIKEY = 'AIzaSyDjUQi1vqjc1j5AbFBIyvy_zXl8qoqwXGo'; 
+const GOOGLE_MAPS_APIKEY = 'AIzaSyDjUQi1vqjc1j5AbFBIyvy_zXl8qoqwXGo';
 const MosqueLocationScreen = () => {
   const [currentLocation, setCurrentLocation] = useState(null);
   const [routeCoords, setRouteCoords] = useState([]);
   const [estimatedTime, setEstimatedTime] = useState('');
-  
+
   useEffect(() => {
     const requestLocationPermission = async () => {
       try {
@@ -78,10 +81,12 @@ const MosqueLocationScreen = () => {
   const fetchRoute = async (origin, destination) => {
     try {
       const response = await axios.get(
-        `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&key=${GOOGLE_MAPS_APIKEY}`
+        `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&key=${GOOGLE_MAPS_APIKEY}`,
       );
 
-      const points = decodePolyline(response.data.routes[0].overview_polyline.points);
+      const points = decodePolyline(
+        response.data.routes[0].overview_polyline.points,
+      );
       setRouteCoords(points);
 
       // Extract the duration (time to destination) from the response
@@ -93,19 +98,23 @@ const MosqueLocationScreen = () => {
   };
 
   // Decode the polyline from Google API response
-  const decodePolyline = (t) => {
+  const decodePolyline = t => {
     let points = [];
-    let index = 0, len = t.length;
-    let lat = 0, lng = 0;
+    let index = 0,
+      len = t.length;
+    let lat = 0,
+      lng = 0;
 
     while (index < len) {
-      let b, shift = 0, result = 0;
+      let b,
+        shift = 0,
+        result = 0;
       do {
         b = t.charCodeAt(index++) - 63;
         result |= (b & 0x1f) << shift;
         shift += 5;
       } while (b >= 0x20);
-      let dlat = ((result & 1) ? ~(result >> 1) : (result >> 1));
+      let dlat = result & 1 ? ~(result >> 1) : result >> 1;
       lat += dlat;
 
       shift = 0;
@@ -115,7 +124,7 @@ const MosqueLocationScreen = () => {
         result |= (b & 0x1f) << shift;
         shift += 5;
       } while (b >= 0x20);
-      let dlng = ((result & 1) ? ~(result >> 1) : (result >> 1));
+      let dlng = result & 1 ? ~(result >> 1) : result >> 1;
       lng += dlng;
 
       points.push({
@@ -128,7 +137,12 @@ const MosqueLocationScreen = () => {
 
   return (
     <View style={styles.container}>
-      <MainScreensHeader title={'Mosque Location'} />
+      <TransparentStatusbar />
+      <AppHeader />
+      <MainScreensHeader
+        subTitle={'Mosque Location'}
+        title={`${mosqueLocation.latitude}'`  + '   ' + `${mosqueLocation.longitude}'`}
+      />
       <MapView
         style={styles.map}
         showsMyLocationButton={true}
@@ -169,7 +183,7 @@ const MosqueLocationScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {flex: 1},
+  container: {flex: 1, backgroundColor: colors.white},
   map: {
     flex: 1,
   },
@@ -194,7 +208,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 4,

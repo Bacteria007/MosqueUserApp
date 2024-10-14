@@ -7,6 +7,8 @@ import {
   RefreshControl,
   Pressable,
   Image,
+  ImageBackground,
+  StatusBar,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import moment from 'moment';
@@ -20,7 +22,6 @@ import WhiteStatusbar from '../components/statusbar/WhiteStatusbar';
 import {Icons} from '../assets/icons/Icons';
 import {schedulePrayerNotifications} from '../utils/PrayerRemiders';
 
-// Redux actions
 import {
   fetchPrayerTimes,
   setSelectedDate,
@@ -29,11 +30,14 @@ import {
   calculateUpcomingAndNextPrayers,
 } from '../reducers/calendarSlice';
 import {appName} from '../services/constants';
+import {onDisplayNotification} from '../utils/PrayerNotification';
+import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
+import {Header} from 'react-native/Libraries/NewAppScreen';
+import AppHeader from '../components/headers/AppHeader';
 
 const PrayerTimesScreen = () => {
   const dispatch = useDispatch();
 
-  // Select states from the calendar slice in Redux
   const {
     prayerTimes,
     filteredPrayerTimes,
@@ -43,34 +47,71 @@ const PrayerTimesScreen = () => {
     upcomingPrayer,
   } = useSelector(state => state.calendar);
 
-  const [date, setDate] = useState(new Date()); // For DateTimePicker
+  const [date, setDate] = useState(new Date());
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
-  // Dispatch action to fetch prayer times on component mount
   useEffect(() => {
     dispatch(fetchPrayerTimes());
   }, [dispatch]);
 
-  // Filter prayers when the selected date or prayer times change
   useEffect(() => {
     dispatch(filterTodayPrayers());
     dispatch(filterPrayerTimes());
   }, [selectedDate, prayerTimes, dispatch]);
 
-   
   useEffect(() => {
     dispatch(calculateUpcomingAndNextPrayers());
     if (todayPrayers) {
-      schedulePrayerNotifications(todayPrayers);
+      // console.log('today=======', todayPrayers);
+      // schedulePrayerNotifications(todayPrayers);
+      // onDisplayNotification(todayPrayers[0]);
     }
   }, [todayPrayers, dispatch]);
 
-  // Handle Date Change
-  const handleDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setDatePickerVisibility(false); // Hide the picker
-    setDate(currentDate);
-    dispatch(setSelectedDate(moment(currentDate).format('DD MMMM, YYYY'))); // Update selected date in Redux
+  const calculateRemainingTime = prayerTime => {
+    if (!prayerTime) return '';
+
+    const currentTime = moment();
+    let prayerTimeMoment = moment(prayerTime, 'HH:mm'); // Assuming prayer time is in "HH:mm" format
+
+    // If the prayer time is before the current time, move it to the next day
+    if (prayerTimeMoment.isBefore(currentTime)) {
+      prayerTimeMoment.add(1, 'day');
+    }
+
+    const duration = moment.duration(prayerTimeMoment.diff(currentTime));
+
+    // Extract hours and minutes from the duration
+    const hours = Math.floor(duration.asHours());
+    const minutes = duration.minutes();
+
+    // Format the remaining time as "Xh Ym"
+    return `${hours}h ${minutes} mins`;
+  };
+
+  // const handleDateChange = (event, selectedDate) => {
+  //   const currentDate = selectedDate || date;
+  //   setDatePickerVisibility(false);
+  //   setDate(currentDate);
+  //   dispatch(setSelectedDate(moment(currentDate).format('DD MMMM, YYYY')));
+  // };
+
+  const handleDateChange = (newDate) => {
+    setDate(newDate);
+    dispatch(setSelectedDate(moment(newDate).format('DD MMMM, YYYY')));
+  };
+  const goToPreviousDate = () => {
+    const previousDate = moment(selectedDate, 'DD MMMM, YYYY')
+      .subtract(1, 'day')
+      .toDate(); // Convert back to Date
+    handleDateChange(previousDate);
+  };
+
+  const goToNextDate = () => {
+    const nextDate = moment(selectedDate, 'DD MMMM, YYYY')
+      .add(1, 'day')
+      .toDate(); // Convert back to Date
+    handleDateChange(nextDate);
   };
 
   const showDatePicker = () => {
@@ -89,7 +130,6 @@ const PrayerTimesScreen = () => {
     return `${formattedHour}:${minute} ${period}`;
   };
 
-  // Function to render each prayer item
   const renderPrayerItem = (item, prayerName, azanTime, jamatTime) => {
     const today = moment().format('DD MMMM, YYYY');
     const isNextPrayer =
@@ -127,14 +167,13 @@ const PrayerTimesScreen = () => {
     );
   };
 
-  // Function to reset the selected date to today
   const refreshToToday = () => {
     const today = moment().format('DD MMMM, YYYY');
     dispatch(setSelectedDate(today));
     dispatch(filterTodayPrayers());
   };
 
-  const isToday = selectedDate === moment().format('DD MMMM, YYYY');
+  const isToday = selectedDate == moment().format('DD MMMM, YYYY');
 
   if (loading) {
     return (
@@ -150,52 +189,74 @@ const PrayerTimesScreen = () => {
   }
   return (
     <>
-      <WhiteStatusbar />
+      <TransparentStatusbar />
       <View style={CommonStyles.container}>
+        <AppHeader />
         <View style={styles.mainCard2}>
-          <View style={{justifyContent: 'space-between', flex: 1}}>
-            <Text style={styles.mosqueTitle} ellipsizeMode="tail">
-              {appName}
-            </Text>
-            <View>
-              <Text style={styles.prayerItemTitle}>
-                Next: {upcomingPrayer?.name || ''}
-              </Text>
-              <Text
+          <ImageBackground
+            source={MyImages.bgheader}
+            style={styles.imageBackground}
+            resizeMode="cover">
+            <View
+              style={{justifyContent: 'center', flex: 1, alignItems: 'center'}}>
+              <View
                 style={{
-                  color: 'white',
-                  fontSize: 16,
-                  fontFamily: fonts.semibold,
+                  alignItems: 'center',
+                  width: '100%',
                 }}>
-                {formatTimeTo12Hour(upcomingPrayer?.time || '')}
-              </Text>
+                <Text style={styles.prayerItemTitle}>
+                  {upcomingPrayer?.name || ''}
+                </Text>
+                <Text
+                  style={{
+                    color: colors.white,
+                    fontSize: 36,
+                    fontFamily: fonts.semibold,
+                  }}>
+                  {formatTimeTo12Hour(upcomingPrayer?.time || '')}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: colors.lighr_grey,
+                    fontFamily: fonts.medium,
+                  }}>
+                  Begins in {calculateRemainingTime(upcomingPrayer?.time) || ''}
+                </Text>
+              </View>
             </View>
-          </View>
-          <View style={styles.imgCard2}>
-            <Image source={MyImages.masjid} style={styles.image} />
-          </View>
+          </ImageBackground>
         </View>
-
-        {/* Date Picker */}
-        <View style={styles.datePickerContainer}>
-          <Pressable onPress={showDatePicker} style={styles.datePicker}>
-            <Text style={styles.dateText}>{selectedDate}</Text>
-            <Icons.AntDesign
-              name="caretdown"
-              size={20}
-              color={colors.light_black}
-              style={{marginBottom: 8}}
-            />
+        <View style={styles.dateContainer}>
+          <Pressable onPress={goToPreviousDate} style={styles.chevronButton}>
+            <Icons.AntDesign name="left" size={18} color={colors.teal} />
           </Pressable>
-          {!isToday && (
-            <Pressable onPress={refreshToToday}>
-              <Icons.MaterialCommunityIcons
-                name="refresh"
-                size={22}
-                color={colors.teal}
+          {/* Date Picker */}
+          <View style={styles.datePickerContainer}>
+            <Pressable onPress={showDatePicker} style={styles.datePicker}>
+              <Text style={styles.dateText}>{selectedDate}</Text>
+              <Icons.AntDesign
+                name="caretdown"
+                size={10}
+                color={colors.light_black}
+                style={{marginBottom: 3}}
               />
             </Pressable>
-          )}
+
+            {!isToday && (
+              <Pressable onPress={refreshToToday}>
+                <Icons.MaterialCommunityIcons
+                  name="refresh"
+                  size={22}
+                  color={colors.primary}
+                />
+              </Pressable>
+            )}
+          </View>
+
+        <Pressable onPress={goToNextDate} style={styles.chevronButton}>
+          <Icons.AntDesign name="right" size={18} color={colors.teal} />
+        </Pressable>
         </View>
 
         {isDatePickerVisible && (
@@ -266,19 +327,40 @@ const PrayerTimesScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  imageBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 14,
+    borderRadius: 15,
+    // paddingTop: StatusBar.currentHeight,
+  },
+  mainCard2: {
+    // flex: 1,
+    margin: 14,
+    borderRadius: 15,
+    height: 180,
+    overflow: 'hidden',
+  },
   datePicker: {
     flexDirection: 'row',
     gap: 7,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  dateContainer: {
+    paddingVertical: 20,
+    marginHorizontal: 20,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexDirection:'row',
+    flex:1
+  },
   datePickerContainer: {
-    width: '100%',
+    // width: '100%',
     flexDirection: 'row',
     gap: 5,
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 20,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
@@ -288,40 +370,11 @@ const styles = StyleSheet.create({
     zIndex: 100, // Ensure it stays on top
   },
   dateText: {
-    fontSize: 18,
+    fontSize: 14,
     color: colors.light_black,
     fontFamily: fonts.bold,
   },
-  mainCard2: {
-    backgroundColor: colors.teal,
-    opacity: 1,
-    paddingHorizontal: 14,
-    paddingTop: 10,
-    paddingBottom: 10,
-    height: 180,
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-    shadowColor: colors.black,
-    shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.5,
-    shadowRadius: 5,
-    elevation: 6,
-  },
-  imgCard2: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.primary,
-    opacity: 1,
-    height: 100,
-    overflow: 'hidden',
-    width: 100,
-    borderRadius: 999,
-    shadowColor: colors.white,
-    shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 6,
-  },
+
   listHeaderItem: {
     paddingHorizontal: 14,
     paddingVertical: 10,
@@ -360,15 +413,21 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
   },
+  title: {
+    fontSize: 14,
+    color: colors.black,
+    fontFamily: fonts.medium,
+  },
   mosqueTitle: {
-    fontSize: 20,
+    fontSize: 18,
     color: colors.white,
-    fontFamily: fonts.semibold,
-    marginBottom: 14,
+    fontFamily: fonts.medium,
+    // marginBottom: 14,
     width: '80%',
+    letterSpacing: 3,
   },
   prayerItemTitle: {
-    fontSize: 14,
+    fontSize: 16,
     color: colors.white,
     fontFamily: fonts.semibold,
   },

@@ -1,43 +1,71 @@
-import { Image, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
-import MyImages from '../../assets/images/MyImages'
-import colors from '../../assets/colors/AppColors'
-import fonts from '../../assets/fonts/MyFonts'
-import { appName } from '../../services/constants'
+import { Image, StatusBar, StyleSheet, Text, View, ImageBackground } from 'react-native';
+import React from 'react';
+import colors from '../../assets/colors/AppColors';
+import fonts from '../../assets/fonts/MyFonts';
+import { appName } from '../../services/constants';
+import MyImages from '../../assets/images/MyImages';
+import LinearGradient from 'react-native-linear-gradient';
 
-const MainScreensHeader = ({ title, subTitle='Stay Connected with Your Faith' }) => {
+const MainScreensHeader = ({ title, subTitle = '' }) => {
+    // <LinearGradient colors={['#042334', '#006665']} style={styles.gcontainer}>
     return (
-        <View style={styles.container}>
-            <View style={styles.imgCard}>
-                <Image
-                    source={MyImages.masjid}
-                    style={styles.image}
-                />
-            </View>
-            <View>
+        <View style={styles.mainCard2}>
+            <ImageBackground
+                source={MyImages.bgheader} // Your background image path
+                style={styles.imageBackground}
+                resizeMode="cover" // Controls how the image fits
+            >
+                <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                    <Text style={styles.appName}>{title}</Text>
+                    {subTitle != '' && <Text style={styles.title}>{subTitle}</Text>}
+                    <Text style={styles.subTitle}>Stay Connected with Your Faith</Text>
+                </View>
+            </ImageBackground>
 
-                <Text style={styles.appName}>{appName}</Text>
-                <Text style={styles.title}>{title}</Text>
-                <Text style={styles.subTitle}>{subTitle}</Text>
-            </View>
         </View>
-    )
-}
+    );
+};
 
-export default MainScreensHeader
+
+export default MainScreensHeader;
 
 const styles = StyleSheet.create({
+    imageBackground: {
+        flex: 1,
+        justifyContent: 'center',
+        paddingHorizontal: 14,
+        borderRadius: 15,
+        // paddingTop: StatusBar.currentHeight,
+    },
+    mainCard2: {
+        // flex: 1,
+        margin: 14,
+        borderRadius: 15,
+        height: 180,
+        overflow: 'hidden',
+    },
+    gcontainer: {
+        // flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 25,
+        margin: 14,
+        borderRadius: 15,
+        height: 180,
+        overflow: 'hidden',
+
+    },
+
     container: {
-        backgroundColor: colors.primary,
         justifyContent: 'center',
         alignItems: 'center',
-        height: 240,
-        // paddingTop:10,paddingBottom:5,
-        shadowColor: colors.black,
+        height: 280,
+        backgroundColor: colors.primary,
+        paddingTop: StatusBar.currentHeight,
+        shadowColor: colors.white,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.5,
         shadowRadius: 5,
-        // Elevation for Android
         elevation: 10,
     },
     image: { height: '100%', width: '100%', resizeMode: 'cover' },
@@ -45,19 +73,16 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: colors.primary,
+        backgroundColor: colors.img3,
         opacity: 1,
-        // padding: 8,
         height: 120,
         overflow: 'hidden',
         width: 120,
         borderRadius: 999,
-        // Shadow properties for iOS
         shadowColor: colors.white,
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
         shadowRadius: 5,
-        // Elevation for Android
         elevation: 4,
     },
     appName: {
@@ -65,18 +90,17 @@ const styles = StyleSheet.create({
         fontFamily: fonts.semibold,
         color: colors.white,
         textAlign: 'center',
-        
     },
     title: {
         fontSize: 16,
         fontFamily: fonts.semibold,
         textAlign: 'center',
-        color: colors.white
+        color: colors.white,
     },
     subTitle: {
         fontSize: 12,
         fontFamily: fonts.normal,
         textAlign: 'center',
-        color: colors.white
+        color: colors.white,
     }
-})
+});

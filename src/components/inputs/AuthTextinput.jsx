@@ -20,7 +20,7 @@ const AuthTextinput = ({
                 value={state}
                 onChangeText={t => setState(t.trim())}
                 placeholder={placeholder}
-                placeholderTextColor={colors.black}
+                placeholderTextColor={colors.white}
                 style={styles.inputStyle}
                 keyboardType={keyboard}
                 autoCapitalize="none"
@@ -36,7 +36,7 @@ const AuthTextinput = ({
                     <Icon
                         name={showPassword ? 'eye-off' : 'eye'}
                         size={24}
-                        color={colors.light_black}
+                        color={colors.white}
                     />
                 </TouchableOpacity>
             )}
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: colors.primaryLight,
+        backgroundColor: 'rgba(22,122,136,0.3)',
         borderRadius: 999,
         paddingLeft: 8,
         paddingRight: 16,
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
         padding: 10,
         fontFamily: fonts.normal,
         fontSize: 14,
-        color: colors.black,
+        color: colors.white,
     },
     eyeIconContainer: {
         marginLeft: 10,

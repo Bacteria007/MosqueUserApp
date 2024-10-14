@@ -17,6 +17,9 @@ import MyImages from '../assets/images/MyImages';
 import {Icons} from '../assets/icons/Icons';
 import ReactNativeModal from 'react-native-modal';
 import PrimaryButton from '../components/buttons/PrimaryButton';
+import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
+import WhiteStatusbar from '../components/statusbar/WhiteStatusbar';
+import AppHeader from '../components/headers/AppHeader';
 
 const DonationScreen = () => {
   const inputsGap = 20;
@@ -72,6 +75,9 @@ const DonationScreen = () => {
 
   return (
     <View style={[CommonStyles.container]}>
+      <TransparentStatusbar />
+      <AppHeader />
+
       <MainScreensHeader title={'Donation'} />
 
       {/* Conditional rendering based on the step */}

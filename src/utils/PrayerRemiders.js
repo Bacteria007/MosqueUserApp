@@ -12,7 +12,7 @@ export const createNotificationChannel = () => {
 
 // Schedule prayer notifications based on today's remaining prayer times
 export const schedulePrayerNotifications = (remainingPrayers = []) => {
-  if (!Array.isArray(remainingPrayers) || remainingPrayers.length === 0) {
+  if (!Array.isArray(remainingPrayers) || remainingPrayers?.length == 0) {
     console.log('No remaining prayers to schedule notifications for.');
     return;
   }

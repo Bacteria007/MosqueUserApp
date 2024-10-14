@@ -4,6 +4,7 @@ const signupURL = 'auth/register';
 const loginURL = 'auth/login';
 const prayerTimesURL = 'prayer-times';
 const mosqueInfoURL = '/mosque-info/';
+// const appName = 'مركزى جامعة غوثية مسجد';
 const appName = 'Markazi Jamia Gausia Masjid';
 const verifyTokenURL='auth/verify/'
 const GET = 'GET';
