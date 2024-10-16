@@ -44,8 +44,7 @@ const ResetPasswordScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-           <AuthHeader/>
-
+      <AuthHeader title={'Reset Password'} style={{height: '65%'}} />
       <View style={CommonStyles.authBottomConatiner}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <AuthTextinput
@@ -99,6 +98,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 12,
     fontFamily: fonts.normal,
+    marginBottom: 30,
   },
   bold: {
     fontSize: 14,

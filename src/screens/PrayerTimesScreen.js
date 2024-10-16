@@ -89,12 +89,12 @@ const PrayerTimesScreen = () => {
     return `${hours}h ${minutes} mins`;
   };
 
-  // const handleDateChange = (event, selectedDate) => {
-  //   const currentDate = selectedDate || date;
-  //   setDatePickerVisibility(false);
-  //   setDate(currentDate);
-  //   dispatch(setSelectedDate(moment(currentDate).format('DD MMMM, YYYY')));
-  // };
+  const handleCalendarDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setDatePickerVisibility(false);
+    setDate(currentDate);
+    dispatch(setSelectedDate(moment(currentDate).format('DD MMMM, YYYY')));
+  };
 
   const handleDateChange = (newDate) => {
     setDate(newDate);
@@ -266,7 +266,7 @@ const PrayerTimesScreen = () => {
             minimumDate={new Date(2024, 0, 1)}
             maximumDate={new Date(2024, 11, 31)}
             display="default"
-            onChange={handleDateChange}
+            onChange={handleCalendarDateChange}
           />
         )}
 

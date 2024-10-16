@@ -78,15 +78,13 @@ const DonationScreen = () => {
       <TransparentStatusbar />
       <AppHeader />
 
-      <MainScreensHeader title={'Donation'} />
-
-      {/* Conditional rendering based on the step */}
-      {step === 1 && (
+      <MainScreensHeader title={'Donate'} />
+      <Text style={styles.undertext}>This feature is under development</Text>
+      {/* {step == 1 && (
         <ScrollView contentContainerStyle={{flexGrow: 1}}>
           <View
             style={[styles.bottomSection, {justifyContent: 'space-around'}]}>
             <View>
-              {/* Radio buttons for donation type */}
               <View style={styles.radioGroup}>
                 <View style={styles.radioButtonContainer}>
                   <Pressable
@@ -135,7 +133,6 @@ const DonationScreen = () => {
                   </Pressable>
                 </View>
               </View>
-              {/* <Text style={styles.modalTitle}>Donation Amount</Text> */}
               <DonationTextinput
                 style={{marginBottom: 20}}
                 setState={setDonationAmount}
@@ -143,7 +140,6 @@ const DonationScreen = () => {
                 placeholder={`Donation Amount`}
                 keyboard="numeric"
               />
-              {/* User info */}
               <DonationTextinput
                 style={{marginBottom: 20}}
                 state={name}
@@ -172,10 +168,9 @@ const DonationScreen = () => {
         </ScrollView>
       )}
 
-      {step === 2 && (
+      {step == 2 && (
         <ScrollView contentContainerStyle={{flexGrow: 1}}>
           <View style={styles.bottomSection}>
-            {/* card details */}
             <DonationTextinput
               state={cardNumber}
               setState={setCardNumber}
@@ -212,8 +207,6 @@ const DonationScreen = () => {
               />
             </View>
           </View>
-
-          {/* Back and Donate Now buttons at the bottom */}
           <View style={styles.bottomButtonsContainer}>
             <Pressable style={styles.backBtn} onPress={() => setStep(1)}>
               <Text style={[styles.buttonText, {color: colors.black}]}>
@@ -225,9 +218,8 @@ const DonationScreen = () => {
             </Pressable>
           </View>
         </ScrollView>
-      )}
+      )} */}
 
-      {/* Modal for Custom Donation Amount */}
       <ReactNativeModal
         statusBarTranslucent
         visible={isModalVisible}
@@ -266,6 +258,12 @@ const DonationScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  undertext: {
+    fontSize: 14,
+    fontFamily: fonts.semibold,
+    color: colors.light_black,
+    textAlign:'center'
+  },
   radioGroup: {
     marginTop: 20,
     marginBottom: 20,

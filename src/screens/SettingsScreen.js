@@ -11,15 +11,11 @@ import {
   RINGER_MODE,
   setRingerMode,
 } from 'react-native-volume-manager';
-import {
-  cancelAllNotifications,
-  createNotificationChannel,
-  schedulePrayerNotifications,
-} from '../utils/PrayerRemiders';
+import BackgroundTimer from 'react-native-background-timer';
+import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
-import WhiteStatusbar from '../components/statusbar/WhiteStatusbar';
 import AppHeader from '../components/headers/AppHeader';
 
 const SettingsScreen = () => {
@@ -28,6 +24,7 @@ const SettingsScreen = () => {
   const todayPrayers = useSelector(state => state.calendar.todayPrayers);
   const dispatch = useDispatch();
   const navigation = useNavigation();
+
   useEffect(() => {
     const fetchRingerMode = async () => {
       try {
@@ -39,8 +36,40 @@ const SettingsScreen = () => {
     };
 
     fetchRingerMode();
-    // createNotificationChannel(todayPrayers);
+    checkAndScheduleSilentMode();
   }, []);
+
+  // Check and schedule silent mode during prayer time
+  const checkAndScheduleSilentMode = async () => {
+    const currentTime = moment(); // Get the current time
+    todayPrayers.forEach(prayer => {
+      const prayerTime = moment(prayer.time, 'HH:mm'); // Assuming time is in "HH:mm"
+
+      // If the current time matches a prayer time
+      if (currentTime.isSame(prayerTime, 'minute')) {
+        setCurrentPrayer(prayer);
+        scheduleSilentMode();
+      }
+    });
+  };
+
+  // Function to schedule silent mode for 10 minutes
+  const scheduleSilentMode = async () => {
+    const hasPermission = await requestDoNotDisturbPermission();
+    if (!hasPermission) {
+      return;
+    }
+
+    // Set phone to silent
+    setRingerMode(RINGER_MODE.silent);
+    setIsSilentModeEnabled(true);
+
+    // Revert to normal mode after 10 minutes
+    BackgroundTimer.setTimeout(() => {
+      setRingerMode(RINGER_MODE.normal);
+      setIsSilentModeEnabled(false);
+    }, 10 * 60 * 1000); // 10 minutes in milliseconds
+  };
 
   const requestDoNotDisturbPermission = async () => {
     try {
@@ -86,6 +115,7 @@ const SettingsScreen = () => {
       cancelAllNotifications();
     }
   };
+
   const handleLogout = async () => {
     try {
       await AsyncStorage.removeItem('token');

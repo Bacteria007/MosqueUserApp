@@ -55,8 +55,8 @@ const LoginScreen = () => {
     if (loginResult.type == 'auth/login/rejected') {
       console.log('Login failed'); // Log the failure
     } else {
-      setEmail('')
-      setPassword('')
+      setEmail('');
+      setPassword('');
       navigation.reset({
         index: 0,
         routes: [{name: 'MainNavigator'}],
@@ -67,8 +67,7 @@ const LoginScreen = () => {
 
   return (
     <View style={styles.container}>
-            <AuthHeader/>
-
+      <AuthHeader title={'Welcome Back!'} />
       <View style={CommonStyles.authBottomConatiner}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <AuthTextinput
@@ -146,6 +145,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 12,
     fontFamily: fonts.normal,
+    marginBottom:30
   },
   bold: {
     fontSize: 14,

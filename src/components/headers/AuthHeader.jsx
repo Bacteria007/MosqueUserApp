@@ -36,7 +36,7 @@ export default AuthHeader;
 
 const styles = StyleSheet.create({
     imageBackground: {
-        height: '60%',
+        height: '55%',
         width: '100%',
         paddingTop: StatusBar.currentHeight+10,
     },

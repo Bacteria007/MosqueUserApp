@@ -67,7 +67,7 @@ const CommonStyles = StyleSheet.create({
     // position: 'absolute',
     // bottom: 0,
     width: '100%',
-    paddingVertical: 20,
+    paddingVertical: 25,
     justifyContent: 'flex-end',
     alignItems: 'center',
     alignSelf: 'center',

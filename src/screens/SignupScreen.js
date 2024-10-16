@@ -88,7 +88,7 @@ const SignupScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <AuthHeader/>
+      <AuthHeader title={'Create Account'}/>
       <View style={CommonStyles.authBottomConatiner}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <AuthTextinput
@@ -164,6 +164,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 12,
     fontFamily: fonts.normal,
+    marginBottom: 20,
+
   },
   bold: {
     color: colors.img1,
