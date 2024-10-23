@@ -1,4 +1,4 @@
-package com.mosqueapp
+package  com.cmykresearch.mosqueuserapp
 
 import android.app.Application
 import com.facebook.react.PackageList

@@ -75,7 +75,6 @@ const LoginScreen = () => {
             state={email}
             setState={setEmail}
             keyboard="email-address"
-            autoCapitalize="none"
           />
           {emailError && (
             <Text style={CommonStyles.errorText}>{emailError}</Text>
@@ -145,7 +144,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 12,
     fontFamily: fonts.normal,
-    marginBottom:30
+    marginBottom:10
   },
   bold: {
     fontSize: 14,

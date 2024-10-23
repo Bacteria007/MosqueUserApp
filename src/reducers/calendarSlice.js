@@ -2,7 +2,6 @@ import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import ApiService from '../services/api';
 import {prayerTimesURL} from '../services/constants';
 import moment from 'moment';
-import {onDisplayNotification} from '../utils/PrayerNotification';
 import {schedulePrayerAlarms} from '../utils/PrayerAlarm';
 
 // Fetch prayer times asynchronously
@@ -86,7 +85,7 @@ const calendarSlice = createSlice({
       state.upcomingPrayer = upcoming || prayerTimes[0];
       state.nextPrayer = next || prayerTimes[1];
 
-      console.log('Upcoming prayer object:', state.upcomingPrayer);
+      // console.log('Upcoming prayer object:', state.upcomingPrayer);
 
       console.log(
         `Next prayer: ${state.nextPrayer ? state.nextPrayer.name : 'None'}`,
@@ -94,10 +93,8 @@ const calendarSlice = createSlice({
 
       if (remainingPrayers.length > 0) {
         console.log('Remaining prayers for notifications:', remainingPrayers);
-        // schedulePrayerNotifications(remainingPrayers);
-        schedulePrayerAlarms(remainingPrayers);
+        // schedulePrayerAlarms(remainingPrayers);
       }
-      // onDisplayNotification(state.upcomingPrayer);
     },
   },
   extraReducers: builder => {
@@ -114,7 +111,7 @@ const calendarSlice = createSlice({
         state.loading = false;
         state.error = action.error.message;
       });
-  }
+  },
 });
 
 export const {

@@ -159,7 +159,7 @@ const MosqueLocationScreen = () => {
           title="Mosque"
           description="Islamiya Mosque">
           <View style={styles.markerContainer}>
-            <Image source={MyImages.masjid} style={styles.markerImage} />
+            <Image source={MyImages.logo} style={styles.markerImage} />
           </View>
         </Marker>
 
@@ -167,7 +167,7 @@ const MosqueLocationScreen = () => {
           <>
             <Polyline
               coordinates={routeCoords}
-              strokeColor={colors.black}
+              strokeColor={colors.primary}
               strokeWidth={3}
             />
           </>

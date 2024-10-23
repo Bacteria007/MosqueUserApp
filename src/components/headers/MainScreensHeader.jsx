@@ -1,24 +1,24 @@
-import { Image, StatusBar, StyleSheet, Text, View, ImageBackground } from 'react-native';
+import { Image, StatusBar, StyleSheet, Text, View, ImageBackground, Dimensions } from 'react-native';
 import React from 'react';
 import colors from '../../assets/colors/AppColors';
 import fonts from '../../assets/fonts/MyFonts';
 import { appName } from '../../services/constants';
 import MyImages from '../../assets/images/MyImages';
-import LinearGradient from 'react-native-linear-gradient';
+
+const { height } = Dimensions.get('window')
+const headerCardHeight = height < 630 ? height * 0.2 : height * 0.25;
 
 const MainScreensHeader = ({ title, subTitle = '' }) => {
-    // <LinearGradient colors={['#042334', '#006665']} style={styles.gcontainer}>
     return (
         <View style={styles.mainCard2}>
             <ImageBackground
-                source={MyImages.bgheader} // Your background image path
+                source={MyImages.bgheader} 
                 style={styles.imageBackground}
-                resizeMode="cover" // Controls how the image fits
+                resizeMode="cover" 
             >
                 <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                     <Text style={styles.appName}>{title}</Text>
                     {subTitle != '' && <Text style={styles.title}>{subTitle}</Text>}
-                    <Text style={styles.subTitle}>Stay Connected with Your Faith</Text>
                 </View>
             </ImageBackground>
 
@@ -35,17 +35,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         paddingHorizontal: 14,
         borderRadius: 15,
-        // paddingTop: StatusBar.currentHeight,
     },
     mainCard2: {
-        // flex: 1,
         margin: 14,
         borderRadius: 15,
-        height: 180,
+        height: headerCardHeight,
+
         overflow: 'hidden',
     },
     gcontainer: {
-        // flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 25,
@@ -92,7 +90,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
     title: {
-        fontSize: 16,
+        fontSize: 18,
         fontFamily: fonts.semibold,
         textAlign: 'center',
         color: colors.white,

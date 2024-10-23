@@ -7,7 +7,6 @@ const TransparentStatusbar = () => {
       backgroundColor={'transparent'}
       translucent
       barStyle={'dark-content'}
-    
     />
   );
 };

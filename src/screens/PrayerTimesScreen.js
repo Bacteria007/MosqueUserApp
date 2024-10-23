@@ -8,7 +8,8 @@ import {
   Pressable,
   Image,
   ImageBackground,
-  StatusBar,
+  Dimensions,
+  ScrollView,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import moment from 'moment';
@@ -20,7 +21,6 @@ import fonts from '../assets/fonts/MyFonts';
 import CommonStyles from '../assets/styles/CommonStyles';
 import WhiteStatusbar from '../components/statusbar/WhiteStatusbar';
 import {Icons} from '../assets/icons/Icons';
-import {schedulePrayerNotifications} from '../utils/PrayerRemiders';
 
 import {
   fetchPrayerTimes,
@@ -29,11 +29,42 @@ import {
   filterPrayerTimes,
   calculateUpcomingAndNextPrayers,
 } from '../reducers/calendarSlice';
-import {appName} from '../services/constants';
-import {onDisplayNotification} from '../utils/PrayerNotification';
 import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
-import {Header} from 'react-native/Libraries/NewAppScreen';
 import AppHeader from '../components/headers/AppHeader';
+import momenthijri from 'moment-hijri';
+import {schedulePrayerAlarms} from '../utils/PrayerAlarm';
+import BackgroundFetch from 'react-native-background-fetch';
+
+const {height, width} = Dimensions.get('window');
+const headerCardHeight = height < 630 ? height * 0.2 : height * 0.25;
+
+const initBackgroundFetch = async () => {
+  BackgroundFetch.configure(
+    {
+      minimumFetchInterval: 1440, // Run every 15 minutes
+      stopOnTerminate: false,
+      startOnBoot: true,
+    },
+    async taskId => {
+      console.log('[BackgroundFetch] Fetching today’s prayers...');
+
+      try {
+        await fetchPrayerTimes(); // Dispatch fetch prayer times action
+      } catch (error) {
+        console.error('Error in background fetch:', error);
+      }
+
+      BackgroundFetch.finish(taskId); // Mark task as completed
+    },
+    error => {
+      console.error('[BackgroundFetch] Failed to start:', error);
+    }
+  );
+
+  const status = await BackgroundFetch.status();
+  console.log('[BackgroundFetch] Status:', status);
+};
+
 
 const PrayerTimesScreen = () => {
   const dispatch = useDispatch();
@@ -46,14 +77,24 @@ const PrayerTimesScreen = () => {
     todayPrayers,
     upcomingPrayer,
   } = useSelector(state => state.calendar);
+  const isReminderEnabled = useSelector(state => state.notification.isReminderEnabled); // Track reminder state from Redux
 
+  
   const [date, setDate] = useState(new Date());
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [islamicDate, setIslamicDate] = useState('');
+  useEffect(() => {
+    const hijriDate = momenthijri().format('iD iMMMM iYYYY'); // Hijri format
+    setIslamicDate(hijriDate); // Convert and set date
+  }, []);
 
   useEffect(() => {
     dispatch(fetchPrayerTimes());
   }, [dispatch]);
-
+  useEffect(() => {
+    // Initialize background fetch on mount
+    initBackgroundFetch();
+  }, [dispatch]);
   useEffect(() => {
     dispatch(filterTodayPrayers());
     dispatch(filterPrayerTimes());
@@ -61,20 +102,17 @@ const PrayerTimesScreen = () => {
 
   useEffect(() => {
     dispatch(calculateUpcomingAndNextPrayers());
-    if (todayPrayers) {
-      // console.log('today=======', todayPrayers);
-      // schedulePrayerNotifications(todayPrayers);
-      // onDisplayNotification(todayPrayers[0]);
+    if (isReminderEnabled && todayPrayers) {
+      schedulePrayerAlarms(todayPrayers);
     }
-  }, [todayPrayers, dispatch]);
+  }, [todayPrayers,isReminderEnabled, dispatch]);
 
   const calculateRemainingTime = prayerTime => {
     if (!prayerTime) return '';
 
     const currentTime = moment();
-    let prayerTimeMoment = moment(prayerTime, 'HH:mm'); // Assuming prayer time is in "HH:mm" format
+    let prayerTimeMoment = moment(prayerTime, 'HH:mm');
 
-    // If the prayer time is before the current time, move it to the next day
     if (prayerTimeMoment.isBefore(currentTime)) {
       prayerTimeMoment.add(1, 'day');
     }
@@ -88,15 +126,24 @@ const PrayerTimesScreen = () => {
     // Format the remaining time as "Xh Ym"
     return `${hours}h ${minutes} mins`;
   };
-
+  // const handleDateChange = (newDate) => {
+  //   setSelectedDate(moment(newDate).format('DD MMMM, YYYY'));
+  // const updatedHijriDate = moment(newDate).format('iD iMMMM iYYYY');
+  // setIslamicDate(updatedHijriDate);
+  // };
   const handleCalendarDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
     setDatePickerVisibility(false);
     setDate(currentDate);
+    const updatedHijriDate = momenthijri(selectedDate).format('iD iMMMM iYYYY');
+    setIslamicDate(updatedHijriDate);
     dispatch(setSelectedDate(moment(currentDate).format('DD MMMM, YYYY')));
   };
 
-  const handleDateChange = (newDate) => {
+  const handleDateChange = newDate => {
+    const updatedHijriDate = momenthijri(newDate).format('iD iMMMM iYYYY');
+    setIslamicDate(updatedHijriDate);
+
     setDate(newDate);
     dispatch(setSelectedDate(moment(newDate).format('DD MMMM, YYYY')));
   };
@@ -188,17 +235,19 @@ const PrayerTimesScreen = () => {
     );
   }
   return (
-    <>
+    <View style={CommonStyles.container}>
       <TransparentStatusbar />
-      <View style={CommonStyles.container}>
-        <AppHeader />
+      <AppHeader />
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={false} onRefresh={onRefresh} />
+        }>
         <View style={styles.mainCard2}>
           <ImageBackground
             source={MyImages.bgheader}
             style={styles.imageBackground}
             resizeMode="cover">
-            <View
-              style={{justifyContent: 'center', flex: 1, alignItems: 'center'}}>
+            <View style={{justifyContent: 'center', alignItems: 'center',}}>
               <View
                 style={{
                   alignItems: 'center',
@@ -210,7 +259,7 @@ const PrayerTimesScreen = () => {
                 <Text
                   style={{
                     color: colors.white,
-                    fontSize: 36,
+                    fontSize: height > 630 ? 36 : 30,
                     fontFamily: fonts.semibold,
                   }}>
                   {formatTimeTo12Hour(upcomingPrayer?.time || '')}
@@ -229,20 +278,31 @@ const PrayerTimesScreen = () => {
         </View>
         <View style={styles.dateContainer}>
           <Pressable onPress={goToPreviousDate} style={styles.chevronButton}>
-            <Icons.AntDesign name="left" size={18} color={colors.teal} />
+            <Icons.Octicons name="chevron-left" size={22} color={colors.teal} />
           </Pressable>
           {/* Date Picker */}
           <View style={styles.datePickerContainer}>
-            <Pressable onPress={showDatePicker} style={styles.datePicker}>
-              <Text style={styles.dateText}>{selectedDate}</Text>
-              <Icons.AntDesign
-                name="caretdown"
-                size={10}
-                color={colors.light_black}
-                style={{marginBottom: 3}}
-              />
-            </Pressable>
-
+            <View>
+              <Pressable onPress={showDatePicker} style={styles.datePicker}>
+                <Text style={styles.dateText}>{selectedDate}</Text>
+                <Icons.AntDesign
+                  name="caretdown"
+                  size={10}
+                  color={colors.black}
+                  style={{marginBottom: 3}}
+                />
+              </Pressable>
+              <Text
+                style={{
+                  fontSize: 15,
+                  fontFamily: fonts.semibold,
+                  color: colors.black,
+                  textAlign: 'center',
+                  marginRight: 10,
+                }}>
+                {islamicDate}
+              </Text>
+            </View>
             {!isToday && (
               <Pressable onPress={refreshToToday}>
                 <Icons.MaterialCommunityIcons
@@ -254,9 +314,13 @@ const PrayerTimesScreen = () => {
             )}
           </View>
 
-        <Pressable onPress={goToNextDate} style={styles.chevronButton}>
-          <Icons.AntDesign name="right" size={18} color={colors.teal} />
-        </Pressable>
+          <Pressable onPress={goToNextDate} style={styles.chevronButton}>
+            <Icons.Octicons
+              name="chevron-right"
+              size={22}
+              color={colors.teal}
+            />
+          </Pressable>
         </View>
 
         {isDatePickerVisible && (
@@ -321,8 +385,8 @@ const PrayerTimesScreen = () => {
             <RefreshControl refreshing={false} onRefresh={onRefresh} />
           }
         />
-      </View>
-    </>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -338,7 +402,7 @@ const styles = StyleSheet.create({
     // flex: 1,
     margin: 14,
     borderRadius: 15,
-    height: 180,
+    height: headerCardHeight,
     overflow: 'hidden',
   },
   datePicker: {
@@ -348,15 +412,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   dateContainer: {
-    paddingVertical: 20,
+    marginTop: 12,
+    marginBottom: 12,
     marginHorizontal: 20,
     justifyContent: 'space-between',
     alignItems: 'center',
-    flexDirection:'row',
-    flex:1
+    flexDirection: 'row',
   },
   datePickerContainer: {
-    // width: '100%',
     flexDirection: 'row',
     gap: 5,
     justifyContent: 'center',
@@ -370,8 +433,8 @@ const styles = StyleSheet.create({
     zIndex: 100, // Ensure it stays on top
   },
   dateText: {
-    fontSize: 14,
-    color: colors.light_black,
+    fontSize: 16,
+    color: colors.black,
     fontFamily: fonts.bold,
   },
 
@@ -389,6 +452,7 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 4},
     shadowRadius: 5,
     elevation: 4,
+    marginTop: 10,
   },
   prayerItem: {
     width: '90%',
@@ -407,9 +471,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   headerTitle: {
-    fontSize: 14,
-    color: colors.teal,
-    fontFamily: fonts.semibold,
+    fontSize: 16,
+    color: colors.primary,
+    fontFamily: fonts.bold,
     flex: 1,
     textAlign: 'center',
   },
@@ -422,27 +486,26 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: colors.white,
     fontFamily: fonts.medium,
-    // marginBottom: 14,
     width: '80%',
     letterSpacing: 3,
   },
   prayerItemTitle: {
-    fontSize: 16,
+    fontSize: 18,
     color: colors.white,
     fontFamily: fonts.semibold,
   },
   prayerText: {
-    fontSize: 14,
+    fontSize: 16,
     color: colors.black,
     fontFamily: fonts.normal,
     flex: 1,
     textAlignVertical: 'top',
   },
   prayerTimeText: {
-    fontSize: 12,
+    fontSize: 14,
     color: colors.black,
     flex: 1,
-    fontFamily: fonts.normal,
+    fontFamily: fonts.bold,
     textAlignVertical: 'center',
     textAlign: 'center',
   },

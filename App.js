@@ -1,16 +1,27 @@
-import React, {useEffect} from 'react';
-import {Provider} from 'react-redux';
-import {StripeProvider} from '@stripe/stripe-react-native';
-import {NavigationContainer} from '@react-navigation/native';
+import React, { useEffect } from 'react';
+import {
+  Alert,
+  LogBox,
+  Platform,
+  ToastAndroid,
+} from 'react-native';
+import {
+  check,
+  request,
+  PERMISSIONS,
+  RESULTS,
+  openSettings,
+} from 'react-native-permissions';
+import { Provider } from 'react-redux';
+import { StripeProvider } from '@stripe/stripe-react-native';
+import { NavigationContainer } from '@react-navigation/native';
 import PushNotification from 'react-native-push-notification';
 import AppNavigator from './src/navigation/AppNavigator';
 import store from './src/store/store';
-import {STRIPE_PUBLISHABLE_KEY} from '@env';
-import {LogBox, Platform, PermissionsAndroid, Alert} from 'react-native';
+import { STRIPE_PUBLISHABLE_KEY } from '@env';
 import Toast from 'react-native-toast-message';
 
 LogBox.ignoreAllLogs(true);
-
 const App = () => {
   useEffect(() => {
     console.log('Configuring notifications...');
@@ -18,50 +29,74 @@ const App = () => {
       onNotification: function (notification) {
         console.log('NOTIFICATION RECEIVED:', notification);
       },
-      requestPermissions: Platform.OS === 'ios',
+      requestPermissions: Platform.OS == 'ios',
     });
 
-    requestNotificationPermission();
+    checkAndRequestNotificationPermission();
   }, []);
 
-  const requestNotificationPermission = async () => {
-    if (Platform.OS === 'android' && Platform.Version >= 33) {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-          {
-            title: 'Notification Permission',
-            message: 'This app requires permission to send notifications.',
-            buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
-            buttonPositive: 'OK',
-          },
+  const checkAndRequestNotificationPermission = async () => {
+    // console.log('uuuuuuuuuu');
+    
+    const permission =
+      Platform.OS == 'android'
+        ? PERMISSIONS.ANDROID.POST_NOTIFICATIONS
+        : PERMISSIONS.IOS.NOTIFICATIONS;
+
+    try {
+      const result = await check(permission);
+      if (result == RESULTS.GRANTED) {
+        console.log(result);
+        
+        console.log('Notification permission granted');
+      } else if (result === RESULTS.DENIED) {
+        console.log('Requesting notification permission...');
+        requestNotificationPermission(permission);
+      } else if (result === RESULTS.BLOCKED) {
+        console.log('Notification permission blocked');
+        Alert.alert(
+          'Permission Required',
+          'Please enable notifications to receive alerts from this app.',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Open Settings',
+              onPress: () => openSettings().catch(() => {
+                console.warn('Unable to open settings');
+              }),
+            },
+          ],
         );
-        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-          console.log('Notification permission granted');
-        } else {
-          console.log('Notification permission denied');
-          Alert.alert(
-            'Permission required',
-            'Notification permission is required to receive notifications.',
-          );
-        }
-      } catch (err) {
-        console.warn(err);
       }
-    } else if (Platform.OS === 'ios') {
-      PushNotification.requestPermissions().then(permission => {
-        if (permission.alert || permission.sound || permission.badge) {
-          console.log('Notification permission granted');
-   
-        } else {
-          console.log('Notification permission denied');
-          Alert.alert(
-            'Permission required',
-            'Notification permission is required to receive notifications.',
-          );
-        }
-      });
+    } catch (error) {
+      console.warn('Error checking notification permission:', error);
+    }
+  };
+
+  const requestNotificationPermission = async (permission) => {
+    try {
+      const result = await request(permission);
+      if (result === RESULTS.GRANTED) {
+        console.log('Notification permission granted');
+        ToastAndroid.show('Permission Granted', ToastAndroid.SHORT);
+      } else {
+        console.log('Notification permission denied');
+        Alert.alert(
+          'Permission Required',
+          'Please enable notifications to receive alerts from this app.',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Open Settings',
+              onPress: () => openSettings().catch(() => {
+                console.warn('Unable to open settings');
+              }),
+            },
+          ],
+        );
+      }
+    } catch (error) {
+      console.warn('Error requesting notification permission:', error);
     }
   };
 

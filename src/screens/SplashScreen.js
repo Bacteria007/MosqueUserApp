@@ -16,59 +16,70 @@ const SplashScreen = () => {
   const navigation = useNavigation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const checkIsLoggedIn = async () => {
-    try {
-      const token = await AsyncStorage.getItem('token');
-      console.log('=token==', token);
+  // const checkIsLoggedIn = async () => {
+  //   try {
+  //     const token = await AsyncStorage.getItem('token');
+  //     console.log('=token==', token);
 
-      if (token) {
-        navigation.reset({
-          index: 0,
-          routes: [{name: 'MainNavigator'}],
-        });
-      } else {
-        navigation.reset({
-          index: 0,
-          routes: [{name: 'AuthNavigator', params: {screen: 'Login'}}],
-        });
-      }
-    } catch (error) {
-      console.log(error);
-      setIsLoggedIn(false);
-    }
-  };
+  //     if (token) {
+  //       navigation.reset({
+  //         index: 0,
+  //         routes: [{name: 'MainNavigator'}],
+  //       });
+  //     } else {
+  //       navigation.reset({
+  //         index: 0,
+  //         routes: [{name: 'AuthNavigator', params: {screen: 'Login'}}],
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     setIsLoggedIn(false);
+  //   }
+  // };
+  // useEffect(() => {
+  //   checkIsLoggedIn();
+  // }, [isLoggedIn]);
+
   useEffect(() => {
-    checkIsLoggedIn();
-  }, [isLoggedIn]);
-
-  useEffect(() => {
-    // Set a timeout of 2 seconds before navigating to the Login screen
-    const timer = setTimeout(() => {}, 3000);
-
-    // Cleanup the timer if the component is unmounted
+    const timer = setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'MainNavigator'}],
+      });
+    }, 3000);
     return () => clearTimeout(timer);
-  }, [navigation]);
+  }, []);
 
   return (
-    <LinearGradient
+    <View style={styles.container}>
+      {/* <LinearGradient
       colors={['#042334', '#006665',]}
       style={styles.container} 
-    >
+    > */}
       <TransparentStatusbar />
-      <Image
-        source={MyImages.logo}
-        style={{height: '30%', width: '30%', borderRadius: 999, resizeMode: 'contain'}}
-      />
-
+      <View style={{alignItems: 'center', justifyContent: 'center'}}>
+        <Image
+          source={MyImages.logo_trans}
+          style={{
+            height: 160,
+            width: 160,
+            borderRadius: 999,
+            resizeMode: 'contain',
+          }}
+        />
+        <Text style={[styles.appName, {marginTop: -20}]}>Ghausia Mosque</Text>
+      </View>
       <View style={styles.lottieContainer}>
         <LottieView
           style={styles.lottie}
-          source={MyImages.loading1}
+          source={MyImages.loading2}
           autoPlay
+          speed={0.7}
           loop={true}
         />
       </View>
-    </LinearGradient>
+    </View>
   );
 };
 
@@ -79,12 +90,14 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#D4EBCC',
+    // backgroundColor: colors.white,
   },
   appName: {
     fontSize: 16,
     fontFamily: fonts.bold,
     color: colors.black,
-    width: '60%',
+    width: '100%',
     textAlign: 'center',
   },
   lottieContainer: {
@@ -95,7 +108,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   lottie: {
-    height: 80,
-    width: 80,
+    height: 50,
+    width: 50,
   },
 });

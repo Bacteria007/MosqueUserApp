@@ -20,7 +20,7 @@ const MainNavigator = () => (
     screenOptions={({route}) => ({
       headerShown: false,
       tabBarLabelStyle: {
-        fontSize: 10,
+        fontSize: 12,
         marginBottom: 6,
         marginTop: 0,
         fontFamily: fonts.semibold,

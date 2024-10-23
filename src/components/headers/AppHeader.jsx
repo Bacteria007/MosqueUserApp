@@ -23,12 +23,12 @@ const AppHeader = () => {
 export default AppHeader
 
 const styles = StyleSheet.create({
-    continer: { flexDirection: 'row', gap: 5, marginTop: StatusBar.currentHeight, height: 50, alignItems: "center" },
+    continer: { flexDirection: 'row',  marginTop: StatusBar.currentHeight+25, height: 55, alignItems: "center" },
     title: {
-        fontSize: 14,
+        fontSize: 16,
         color: colors.black,
-        fontFamily: fonts.medium,
+        fontFamily: fonts.semibold,
     },
-    logo: { height: '100%', width: '20%', resizeMode: 'center' },
+    logo: { height: '100%', width: '25%', resizeMode: 'center' },
 
 })

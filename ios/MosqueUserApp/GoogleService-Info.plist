@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyC9fBMRKCQJSICoTJS5azQKmPu9MtDTgUw</string>
+	<key>GCM_SENDER_ID</key>
+	<string>934350448285</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.cmykresearch.mosqueuserapp</string>
+	<key>PROJECT_ID</key>
+	<string>my-first-project-c3b56</string>
+	<key>STORAGE_BUCKET</key>
+	<string>my-first-project-c3b56.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:934350448285:ios:17f26c1d5e050ed46a9674</string>
+</dict>
+</plist>

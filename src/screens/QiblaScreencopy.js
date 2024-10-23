@@ -24,7 +24,7 @@ import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
 import LinearGradient from 'react-native-linear-gradient';
 import AppHeader from '../components/headers/AppHeader';
 
-const QiblaScreen = () => {
+const QiblaScreencopy = () => {
   const [heading, setHeading] = useState(0);
   const [qiblaDirection, setQiblaDirection] = useState(0);
   const [rotation, setRotation] = useState(new Animated.Value(0));
@@ -182,30 +182,30 @@ const styles = StyleSheet.create({
     borderRadius: 999,
   },
   compassContainer: {
-    width: 230,
-    height: 230,
+    width: 260,
+    height: 260,
     justifyContent: 'center',
     alignItems: 'center',
     // flex: 1,
     alignSelf: 'center',
     backgroundColor: colors.white,
     // iOS shadow
-    shadowColor: colors.white,
-    shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
+    // shadowColor: colors.white,
+    // shadowOffset: {width: 0, height: 4},
+    // shadowOpacity: 0.3,
+    // shadowRadius: 4.65,
     // Android elevation
-    elevation: 2,
+    // elevation: 8,
     borderRadius: 999,
   },
   compassBackground: {
-    width: 210,
-    height: 210,
+    width: 230,
+    height: 230,
     borderRadius: 999,
   },
   needle: {
-    width: 340,
-    height: 340,
+    width: 120,
+    height: 120,
     position: 'absolute',
     resizeMode: 'contain',
   },
@@ -227,4 +227,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default QiblaScreen;
+export default QiblaScreencopy;

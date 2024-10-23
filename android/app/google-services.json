@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "934350448285",
+    "project_id": "my-first-project-c3b56",
+    "storage_bucket": "my-first-project-c3b56.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:934350448285:android:91523c104cde239c6a9674",
+        "android_client_info": {
+          "package_name": "com.cmykresearch.mosqueuserapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpAsLKRwS3QfE0d0YspWXiQ7PkvQKsnzs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

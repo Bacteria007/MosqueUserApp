@@ -11,7 +11,7 @@ export const login = createAsyncThunk(
       const response = await ApiService({
         method: 'POST',
         url: loginURL,
-        data: {email, password},
+        data: {email, password,role:'user'},
       });
 
       const {data} = response;

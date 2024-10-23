@@ -55,6 +55,7 @@ const styles = StyleSheet.create({
         paddingLeft: 8,
         paddingRight: 16,
         marginBottom: 10,
+    // marginHorizontal: 16,
     },
     inputStyle: {
         flex: 1,
@@ -62,6 +63,7 @@ const styles = StyleSheet.create({
         fontFamily: fonts.normal,
         fontSize: 14,
         color: colors.white,
+        width:'100%'
     },
     eyeIconContainer: {
         marginLeft: 10,

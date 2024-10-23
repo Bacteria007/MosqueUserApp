@@ -67,7 +67,12 @@
     </intent-filter>
 </receiver>
 
-
+<receiver android:enabled="true" android:exported="false" android:name="com.transistorsoft.tsbackgroundfetch.BootReceiver">
+  <intent-filter>
+    <action android:name="android.intent.action.BOOT_COMPLETED" />
+    <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+  </intent-filter>
+</receiver>
         <service
             android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationListenerService"
             android:exported="false" >
@@ -77,4 +82,6 @@
         </service>
 
     </application>
+
+
 </manifest>

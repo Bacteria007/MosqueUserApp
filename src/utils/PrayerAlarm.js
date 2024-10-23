@@ -1,4 +1,4 @@
-import notifee, { EventType, TriggerType, TimestampTrigger } from '@notifee/react-native'; 
+import notifee, { EventType, TriggerType, TimestampTrigger } from '@notifee/react-native';
 import { PermissionsAndroid, Platform } from 'react-native';
 import moment from 'moment'; // For time formatting and calculations
 import { appName } from '../services/constants';
@@ -26,7 +26,7 @@ const formatTo12Hour = time => {
 const calculateTriggerTimestamp = prayerTime => {
   const currentTime = moment();
   const targetTime = moment(prayerTime, 'HH:mm:ss');
-  
+
   if (targetTime.isBefore(currentTime)) {
     console.log(`Prayer time for ${prayerTime} has already passed today`);
     return null;
@@ -42,6 +42,14 @@ notifee.onForegroundEvent(({ type, detail }) => {
     // Add navigation or other logic here to open a specific screen when the notification is clicked
   }
 });
+
+// Check if a notification for a specific prayer is already scheduled
+async function isNotificationScheduled(prayerName) {
+  const notifications = await notifee.getTriggerNotifications();
+  return notifications.some(notification => 
+    notification.notification.title.includes(prayerName)
+  );
+}
 
 // Function to schedule alarms for all prayers in the array
 export async function schedulePrayerAlarms(prayers) {
@@ -59,9 +67,16 @@ export async function schedulePrayerAlarms(prayers) {
 
   // Loop through each prayer and schedule a notification
   for (const prayer of prayers) {
+    // Check if notification is already scheduled for this prayer
+    const isScheduled = await isNotificationScheduled(prayer.name);
+    if (isScheduled) {
+      console.log(`Skipping ${prayer.name}, notification already scheduled.`);
+      continue;
+    }
+
     // Calculate formatted time and the trigger timestamp
-    const formattedTime = formatTo12Hour(prayer.time); // Format the time (e.g., 4:30 PM)
-    const triggerTimestamp = calculateTriggerTimestamp(prayer.time); // Get the timestamp for the prayer time
+    const formattedTime = formatTo12Hour(prayer.time);
+    const triggerTimestamp = calculateTriggerTimestamp(prayer.time);
 
     if (!triggerTimestamp) {
       console.log(`Skipping ${prayer.name}, time has already passed.`);
@@ -78,17 +93,17 @@ export async function schedulePrayerAlarms(prayers) {
     try {
       await notifee.createTriggerNotification(
         {
-          title: `${prayer.name} ${formattedTime}`, // e.g., "Asr 4:30 PM"
+          title: `${prayer.name} ${formattedTime}`,
           subtitle: appName,
           body: `It's time for ${prayer.name} prayer`,
           android: {
             channelId,
-            smallIcon: 'ic_launcher', // `res/drawable` folder
+            smallIcon: 'ic_launcher',
             largeIcon: 'ic_launcher',
             sound: 'azan',
             pressAction: {
-              id: 'default', // Required for handling notification press
-              launchActivity: 'default', // Ensure this launches the app when clicked
+              id: 'default',
+              launchActivity: 'default',
             },
           },
         },
@@ -100,3 +115,25 @@ export async function schedulePrayerAlarms(prayers) {
     }
   }
 }
+
+// Function to cancel all scheduled notifications
+export const cancelAllScheduledNotifications = async () => {
+  try {
+    const notifications = await notifee.getTriggerNotifications();
+    
+    notifications.forEach(notification => {
+      const { id } = notification.notification; // Extract the ID correctly
+      if (id) {
+        notifee.cancelNotification(id); // Cancel notification using the correct ID
+        console.log(`Canceled notification with ID: ${id}`);
+      } else {
+        console.warn('Notification ID is missing, skipping cancellation.');
+      }
+    });
+
+    console.log('All scheduled notifications have been canceled.');
+  } catch (error) {
+    console.error('Error canceling notifications:', error);
+  }
+};
+

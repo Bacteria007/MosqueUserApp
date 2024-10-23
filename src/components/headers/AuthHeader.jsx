@@ -1,10 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, ImageBackground, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ImageBackground, StatusBar, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import MyImages from '../../assets/images/MyImages';
 import { Icons } from '../../assets/icons/Icons';
 import fonts from '../../assets/fonts/MyFonts';
 import WhiteStatusbar from '../statusbar/WhiteStatusbar';
+
+const { height } = Dimensions.get('window')
+const headerHeight = height < 630 ? height * 0.45 : height * 0.50;
 
 const AuthHeader = ({ title, style }) => {
     const navigation = useNavigation();
@@ -36,20 +39,21 @@ export default AuthHeader;
 
 const styles = StyleSheet.create({
     imageBackground: {
-        height: '55%',
+        height: headerHeight,
         width: '100%',
-        paddingTop: StatusBar.currentHeight+10,
+        paddingTop: StatusBar.currentHeight + 10,
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 20,
+        marginTop:15
     },
     backButton: {
         paddingRight: 20,
     },
     title: {
-        fontSize: 20,
+        fontSize: 18,
         color: '#fff',
         fontFamily: fonts.normal
     },
