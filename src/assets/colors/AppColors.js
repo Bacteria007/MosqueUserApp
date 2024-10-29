@@ -1,10 +1,12 @@
 const colors = {
   white: '#fff',
   blue: '#1974ec',
-  primary: '#006665',
+  // primary: '#006665',
+  secondary: '#94c11e', //-- green
+  primary: '#01505d',
   teal: '#009a9a',
   black: 'black',
-  secondary: '#FCA625',
+  // secondary: '#FCA625',
   primaryLight: 'rgba(41, 185, 185, 0.13)',
   tab_inactive: '#C0C5C2',
   bg_light: '#d0e9fd',
@@ -20,5 +22,6 @@ const colors = {
   img4:'#042334',
   img2:'#006665',
   img5:'#044154',
+  // g1:'#01505d',
 };
 export default colors;

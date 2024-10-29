@@ -137,3 +137,22 @@ export const cancelAllScheduledNotifications = async () => {
   }
 };
 
+
+export async function scheduleWeeklyPrayerAlarms(weeklyPrayers) {
+  console.log('Scheduling weekly prayer alarms...');
+
+  await requestNotificationPermission(); // Ensure permission
+  const channelId = await createNotificationChannel(); // Create channel
+
+  // Loop through each day and prayer to schedule notifications
+  for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
+    const dateStr = moment().add(dayOffset, 'days').format('YYYY-MM-DD');
+    console.log(`Scheduling prayers for: ${dateStr}`);
+
+    for (const prayer of weeklyPrayers) {
+      await schedulePrayerAlarms(prayer, dayOffset, channelId);
+    }
+  }
+  console.log('All weekly prayer alarms have been scheduled.');
+}
+

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Image, View, StyleSheet, Text} from 'react-native';
+import {Image, View, StyleSheet, Text, Dimensions} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import WhiteStatusbar from '../components/statusbar/WhiteStatusbar';
 import CommonStyles from '../assets/styles/CommonStyles';
@@ -12,6 +12,7 @@ import MyImages from '../assets/images/MyImages';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
 
+const {height,width}=Dimensions.get('window')
 const SplashScreen = () => {
   const navigation = useNavigation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -52,34 +53,37 @@ const SplashScreen = () => {
   }, []);
 
   return (
-    <View style={styles.container}>
-      {/* <LinearGradient
+    // <View style={styles.container}>
+      <LinearGradient
       colors={['#042334', '#006665',]}
       style={styles.container} 
-    > */}
-      <TransparentStatusbar />
+    >
+      <WhiteStatusbar />
       <View style={{alignItems: 'center', justifyContent: 'center'}}>
         <Image
           source={MyImages.logo_trans}
           style={{
-            height: 160,
-            width: 160,
+            height:height>630? 350:300,
+            // width: height>630? 290:310,
             borderRadius: 999,
             resizeMode: 'contain',
-          }}
+            
+          }} tintColor={colors.white}
         />
-        <Text style={[styles.appName, {marginTop: -20}]}>Ghausia Mosque</Text>
+        {/* <Text style={[styles.appName, {marginTop: -20}]}>Ghausia Nelson</Text> */}
       </View>
       <View style={styles.lottieContainer}>
         <LottieView
           style={styles.lottie}
-          source={MyImages.loading2}
+          source={MyImages.loading1}
           autoPlay
           speed={0.7}
           loop={true}
         />
       </View>
-    </View>
+      </LinearGradient>
+    // </View>
+    
   );
 };
 

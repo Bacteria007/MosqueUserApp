@@ -11,14 +11,12 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        // Ensure these are properly placed
-        maven { url "${project(':react-native-background-fetch').projectDir}/libs" }
         maven { url "$rootDir/../node_modules/react-native-background-fetch/android/libs" }
     }
 
     dependencies {
         classpath("com.google.gms:google-services:4.4.2")
-        classpath("com.android.tools.build:gradle:8.1.0") // Ensure gradle version compatibility
+        classpath("com.android.tools.build:gradle:8.1.0")
         classpath("com.facebook.react:react-native-gradle-plugin")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
     }
@@ -28,9 +26,8 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        maven { url "${project(':react-native-background-fetch').projectDir}/libs" }
         maven { url "$rootDir/../node_modules/react-native-background-fetch/android/libs" }
     }
 }
 
-apply plugin: "com.facebook.react.rootproject"
+apply plugin: "com.facebook.react"

@@ -10,6 +10,9 @@ import {
   ImageBackground,
   Dimensions,
   ScrollView,
+  Platform,
+  Alert,
+  Linking,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import moment from 'moment';
@@ -28,12 +31,16 @@ import {
   filterTodayPrayers,
   filterPrayerTimes,
   calculateUpcomingAndNextPrayers,
+  calculateWeeklyPrayers,
 } from '../reducers/calendarSlice';
 import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
 import AppHeader from '../components/headers/AppHeader';
 import momenthijri from 'moment-hijri';
 import {schedulePrayerAlarms} from '../utils/PrayerAlarm';
 import BackgroundFetch from 'react-native-background-fetch';
+import { useFocusEffect } from '@react-navigation/native';
+import {check, PERMISSIONS, RESULTS} from 'react-native-permissions';
+import DeviceInfo from 'react-native-device-info';
 
 const {height, width} = Dimensions.get('window');
 const headerCardHeight = height < 630 ? height * 0.2 : height * 0.25;
@@ -58,13 +65,12 @@ const initBackgroundFetch = async () => {
     },
     error => {
       console.error('[BackgroundFetch] Failed to start:', error);
-    }
+    },
   );
 
   const status = await BackgroundFetch.status();
   console.log('[BackgroundFetch] Status:', status);
 };
-
 
 const PrayerTimesScreen = () => {
   const dispatch = useDispatch();
@@ -76,13 +82,84 @@ const PrayerTimesScreen = () => {
     loading,
     todayPrayers,
     upcomingPrayer,
+    weeklyPrayerTimes
   } = useSelector(state => state.calendar);
-  const isReminderEnabled = useSelector(state => state.notification.isReminderEnabled); // Track reminder state from Redux
+  const isReminderEnabled = useSelector(
+    state => state.notification.isReminderEnabled,
+  ); // Track reminder state from Redux
 
-  
   const [date, setDate] = useState(new Date());
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [islamicDate, setIslamicDate] = useState('');
+  
+
+  //  ==== Location start
+  useFocusEffect(
+    React.useCallback(() => {
+      checkAndRequestLocationPermission(); // Re-check location permission on focus
+    }, []),
+  );
+
+  const checkAndRequestLocationPermission = async () => {
+    const permissionStatus = await check(
+      Platform.OS === 'android'
+        ? PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION
+        : PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
+    );
+
+    if (permissionStatus === RESULTS.GRANTED) {
+      checkIfLocationServicesEnabled(); // If permission granted, check GPS
+    } else {
+      requestLocationPermission(); // Request permission if not granted
+    }
+  };
+
+  const checkIfLocationServicesEnabled = async () => {
+    const isLocationEnabled = await DeviceInfo.isLocationEnabled(); // Check if GPS is on
+    if (isLocationEnabled) {
+      // getCurrentLocation(); // Get location if GPS is enabled
+    } else {
+      showEnableLocationAlert(); // Prompt to enable GPS
+    }
+  };
+
+  const requestLocationPermission = async () => {
+    const granted = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      {
+        title: 'Location Permission',
+        message:
+          'We need access to your location to show you relevant information.',
+        buttonNeutral: 'Ask Me Later',
+        buttonNegative: 'Cancel',
+        buttonPositive: 'OK',
+      },
+    );
+
+    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+      checkIfLocationServicesEnabled(); // Check GPS if permission granted
+    } else {
+      console.log('Location permission denied');
+    }
+  };
+  const showEnableLocationAlert = () => {
+    Alert.alert(
+      'Enable Location',
+      'Please enable location services and ensure GPS is on.',
+      [
+        {text: 'Cancel', style: 'cancel'},
+        {
+          text: 'Enable',
+          onPress: () =>
+            Linking.sendIntent(
+              'android.settings.LOCATION_SOURCE_SETTINGS',
+            )
+        },
+      ],
+    );
+  };
+
+  // ============ Location End
   useEffect(() => {
     const hijriDate = momenthijri().format('iD iMMMM iYYYY'); // Hijri format
     setIslamicDate(hijriDate); // Convert and set date
@@ -103,9 +180,43 @@ const PrayerTimesScreen = () => {
   useEffect(() => {
     dispatch(calculateUpcomingAndNextPrayers());
     if (isReminderEnabled && todayPrayers) {
-      schedulePrayerAlarms(todayPrayers);
+      const prayerArray = preparePrayerData(todayPrayers);
+      schedulePrayerAlarms(prayerArray);
     }
-  }, [todayPrayers,isReminderEnabled, dispatch]);
+  }, [todayPrayers, isReminderEnabled, dispatch]);
+
+  // =======
+  useEffect(() => {
+    dispatch(fetchPrayerTimes()).then(() => {
+      dispatch(calculateWeeklyPrayers());
+    });
+  }, [dispatch]);
+  
+  const scheduleAlarmsForNext7Days = (prayerTimes) => {
+    prayerTimes.forEach((day) => {
+      const prayers = preparePrayerData(day);
+      prayers.forEach((prayer) => {
+        schedulePrayerAlarms(prayer);
+      });
+    });
+  };
+  
+  // Call it after fetching and filtering
+  useEffect(() => {
+    if (isReminderEnabled) {
+      scheduleAlarmsForNext7Days(weeklyPrayerTimes);
+    }
+  }, [weeklyPrayerTimes, isReminderEnabled]);
+  
+  // =======
+  // Utility function to format prayer data
+  const preparePrayerData = data => [
+    {name: 'Fajar', time: data.fajar_jamat},
+    {name: 'Zuhar', time: data.zuhar_jamat},
+    {name: 'Asar', time: data.asar_jamat},
+    {name: 'Magrib', time: data.magrib_jamat},
+    {name: 'Isha', time: data.isha_jamat},
+  ];
 
   const calculateRemainingTime = prayerTime => {
     if (!prayerTime) return '';
@@ -247,31 +358,31 @@ const PrayerTimesScreen = () => {
             source={MyImages.bgheader}
             style={styles.imageBackground}
             resizeMode="cover">
-            <View style={{justifyContent: 'center', alignItems: 'center',}}>
-              <View
-                style={{
-                  alignItems: 'center',
-                  width: '100%',
-                }}>
-                <Text style={styles.prayerItemTitle}>
-                  {upcomingPrayer?.name || ''}
-                </Text>
-                <Text
-                  style={{
-                    color: colors.white,
-                    fontSize: height > 630 ? 36 : 30,
-                    fontFamily: fonts.semibold,
-                  }}>
-                  {formatTimeTo12Hour(upcomingPrayer?.time || '')}
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    color: colors.lighr_grey,
-                    fontFamily: fonts.medium,
-                  }}>
-                  Begins in {calculateRemainingTime(upcomingPrayer?.time) || ''}
-                </Text>
+            {/* Light black overlay */}
+            <View style={styles.overlayContainer}>
+              <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                <View style={{alignItems: 'center', width: '100%'}}>
+                  <Text style={styles.prayerItemTitle}>
+                    {upcomingPrayer?.name || ''}
+                  </Text>
+                  <Text
+                    style={{
+                      color: colors.white,
+                      fontSize: height > 630 ? 36 : 30,
+                      fontFamily: fonts.semibold,
+                    }}>
+                    {formatTimeTo12Hour(upcomingPrayer?.time || '')}
+                  </Text>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      color: colors.lighr_grey,
+                      fontFamily: fonts.medium,
+                    }}>
+                    Begins in{' '}
+                    {calculateRemainingTime(upcomingPrayer?.time) || ''}
+                  </Text>
+                </View>
               </View>
             </View>
           </ImageBackground>
@@ -395,13 +506,19 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     paddingHorizontal: 14,
-    borderRadius: 15,
+    borderRadius: 10,
     // paddingTop: StatusBar.currentHeight,
+  },
+  overlayContainer: {
+    ...StyleSheet.absoluteFillObject, // Makes the overlay cover the entire ImageBackground
+    backgroundColor: 'rgba(0, 0, 0, 0.4)', // Semi-transparent black
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   mainCard2: {
     // flex: 1,
     margin: 14,
-    borderRadius: 15,
+    borderRadius: 10,
     height: headerCardHeight,
     overflow: 'hidden',
   },
@@ -451,7 +568,7 @@ const styles = StyleSheet.create({
     shadowColor: colors.teal,
     shadowOffset: {width: 0, height: 4},
     shadowRadius: 5,
-    elevation: 4,
+    elevation:  height > 630 ? 4 : 2,
     marginTop: 10,
   },
   prayerItem: {
@@ -467,7 +584,7 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.5,
     shadowRadius: 5,
-    elevation: 4,
+    elevation: height > 630 ? 4 : 2,
     marginBottom: 20,
   },
   headerTitle: {

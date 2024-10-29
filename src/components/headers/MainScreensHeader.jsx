@@ -8,17 +8,20 @@ import MyImages from '../../assets/images/MyImages';
 const { height } = Dimensions.get('window')
 const headerCardHeight = height < 630 ? height * 0.2 : height * 0.25;
 
-const MainScreensHeader = ({ title, subTitle = '' }) => {
+const MainScreensHeader = ({ title, subTitle = '',style }) => {
     return (
-        <View style={styles.mainCard2}>
+        <View style={[styles.mainCard2,{...style}]}>
             <ImageBackground
-                source={MyImages.bgheader} 
+                source={MyImages.bgheader}
                 style={styles.imageBackground}
-                resizeMode="cover" 
+                resizeMode="cover"
             >
-                <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-                    <Text style={styles.appName}>{title}</Text>
-                    {subTitle != '' && <Text style={styles.title}>{subTitle}</Text>}
+                <View style={styles.overlayContainer}>
+
+                    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                        <Text style={styles.appName}>{title}</Text>
+                        {subTitle != '' && <Text style={styles.title}>{subTitle}</Text>}
+                    </View>
                 </View>
             </ImageBackground>
 
@@ -30,17 +33,22 @@ const MainScreensHeader = ({ title, subTitle = '' }) => {
 export default MainScreensHeader;
 
 const styles = StyleSheet.create({
+    overlayContainer: {
+        ...StyleSheet.absoluteFillObject, // Makes the overlay cover the entire ImageBackground
+        backgroundColor: 'rgba(0, 0, 0, 0.4)', // Semi-transparent black
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     imageBackground: {
         flex: 1,
         justifyContent: 'center',
         paddingHorizontal: 14,
-        borderRadius: 15,
+        borderRadius: 10,
     },
     mainCard2: {
         margin: 14,
-        borderRadius: 15,
+        borderRadius: 10,
         height: headerCardHeight,
-
         overflow: 'hidden',
     },
     gcontainer: {

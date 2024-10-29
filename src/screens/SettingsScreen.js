@@ -6,7 +6,7 @@ import BackgroundTimer from 'react-native-background-timer';
 import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import { cancelAllScheduledNotifications, schedulePrayerAlarms } from '../utils/PrayerAlarm';
+import { cancelAllScheduledNotifications, schedulePrayerAlarms, scheduleWeeklyPrayerAlarms } from '../utils/PrayerAlarm';
 import { setReminderEnabled } from '../reducers/notificationSlice';
 import CommonStyles from '../assets/styles/CommonStyles';
 import colors from '../assets/colors/AppColors';
@@ -18,6 +18,7 @@ import AppHeader from '../components/headers/AppHeader';
 const SettingsScreen = () => {
   const [isSilentModeEnabled, setIsSilentModeEnabled] = useState(false);
   const todayPrayers = useSelector(state => state.calendar.todayPrayers);
+  const weeklyPrayerTimes = useSelector(state => state.calendar.weeklyPrayerTimes);
   const isReminderEnabled = useSelector(state => state.notification.isReminderEnabled);
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -97,10 +98,36 @@ const SettingsScreen = () => {
     }
   };
 
+  // useEffect(() => {
+  //   if (isReminderEnabled) {
+  //     scheduleAlarmsForNext7Days(weeklyPrayerTimes);
+  //   }
+  // }, [weeklyPrayerTimes, isReminderEnabled]);
+  
+  const preparePrayerData = data => [
+    {name: 'Fajar', time: data.fajar_jamat},
+    {name: 'Zuhar', time: data.zuhar_jamat},
+    {name: 'Asar', time: data.asar_jamat},
+    {name: 'Magrib', time: data.magrib_jamat},
+    {name: 'Isha', time: data.isha_jamat},
+  ];
+
+  const scheduleAlarmsForNext7Days = (prayerTimes) => {
+    prayerTimes.forEach((day) => {
+      const prayers = preparePrayerData(day);
+      prayers.forEach((prayer) => {
+        schedulePrayerAlarms(prayer);
+      });
+    });
+  };
+  
+  // Call it after fetching and filtering
+  
   const handleReminderSwitch = (value) => {
     dispatch(setReminderEnabled(value));
     if (value) {
-      schedulePrayerAlarms(todayPrayers);
+      // schedulePrayerAlarms(todayPrayers);
+      scheduleAlarmsForNext7Days(weeklyPrayerTimes);
     } else {
       cancelAllScheduledNotifications();
     }
@@ -125,7 +152,7 @@ const SettingsScreen = () => {
           <View style={{ flex: 1 }}>
             <Text style={styles.alarmTitle}>Prayer Reminder Notification</Text>
             <Text style={styles.alarmDesc}>
-              Turn on Jamat Notifications to stay updated with the mosque’s prayer times.
+              Turn on Prayer Notifications to stay updated with the mosque’s prayer times.
             </Text>
           </View>
           <Switch value={isReminderEnabled} onValueChange={handleReminderSwitch} />

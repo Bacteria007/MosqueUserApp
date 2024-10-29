@@ -17,6 +17,7 @@ const calendarSlice = createSlice({
   name: 'calendar',
   initialState: {
     prayerTimes: [],
+    weeklyPrayerTimes: [],
     todayPrayers: {},
     filteredPrayerTimes: {},
     upcomingPrayer: null,
@@ -96,6 +97,17 @@ const calendarSlice = createSlice({
         // schedulePrayerAlarms(remainingPrayers);
       }
     },
+    calculateWeeklyPrayers: (state) => {
+      const today = moment(); // Today's date
+      const nextSevenDays = moment().add(7, 'days'); // Date 7 days from today
+    
+      state.weeklyPrayerTimes = state.prayerTimes.filter((item) => {
+        const prayerDate = moment(item.date, 'YYYY-MM-DD'); // Assuming date format is 'YYYY-MM-DD'
+        return prayerDate.isBetween(today, nextSevenDays, null, '[]'); // Check if within the next 7 days
+      });
+    
+      console.log('Next 7 days prayer times:', state.weeklyPrayerTimes);
+    }, 
   },
   extraReducers: builder => {
     builder
@@ -119,6 +131,7 @@ export const {
   filterTodayPrayers,
   filterPrayerTimes,
   calculateUpcomingAndNextPrayers,
+  calculateWeeklyPrayers
 } = calendarSlice.actions;
 
 export default calendarSlice.reducer;

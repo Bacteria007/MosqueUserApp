@@ -4,10 +4,11 @@ const signupURL = 'auth/register';
 const loginURL = 'auth/login';
 const prayerTimesURL = 'prayer-times';
 const mosqueInfoURL = 'mosque-info/';
-const appName = 'Markazi Jamia Ghausia Masjid';
+const appName = 'Markazi Jamia Ghausia Mosque';
 const verifyTokenURL='auth/verify/'
 const GET = 'GET';
 const POST = 'POST';
+const GOOGLE_MAPS_APIKEY = 'AIzaSyDjUQi1vqjc1j5AbFBIyvy_zXl8qoqwXGo';
 
 module.exports = {
   baseURL,
@@ -18,6 +19,7 @@ module.exports = {
   prayerTimesURL,
   appName,
   mosqueInfoURL,
-  verifyTokenURL
+  verifyTokenURL,
+  GOOGLE_MAPS_APIKEY
 };
 // const appName = 'مركزى جامعة غوثية مسجد';
