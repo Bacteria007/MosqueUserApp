@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, Switch, StyleSheet, Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { VolumeManager, RINGER_MODE, setRingerMode } from 'react-native-volume-manager';
@@ -6,8 +6,9 @@ import BackgroundTimer from 'react-native-background-timer';
 import moment from 'moment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import { cancelAllScheduledNotifications, schedulePrayerAlarms, scheduleWeeklyPrayerAlarms } from '../utils/PrayerAlarm';
-import { setReminderEnabled } from '../reducers/notificationSlice';
+import { cancelAllScheduledNotifications, schedulePrayerAlarms } from '../utils/PrayerAlarm';
+import { setAutoSilentEnabled, setReminderEnabled } from '../reducers/notificationSlice';
+import { getNextPrayerData } from '../reducers/calendarSlice';
 import CommonStyles from '../assets/styles/CommonStyles';
 import colors from '../assets/colors/AppColors';
 import MainScreensHeader from '../components/headers/MainScreensHeader';
@@ -16,56 +17,41 @@ import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
 import AppHeader from '../components/headers/AppHeader';
 
 const SettingsScreen = () => {
-  const [isSilentModeEnabled, setIsSilentModeEnabled] = useState(false);
-  const todayPrayers = useSelector(state => state.calendar.todayPrayers);
-  const weeklyPrayerTimes = useSelector(state => state.calendar.weeklyPrayerTimes);
   const isReminderEnabled = useSelector(state => state.notification.isReminderEnabled);
+  const isAutoSilentEnabled = useSelector(state => state.notification.isAutoSilentEnabled);
+  const nextPrayer = useSelector(state => state.calendar.nextPrayer);
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
   useEffect(() => {
-    fetchInitialRingerMode();
-  }, []);
+    // Get the next prayer data upon component mount
+    dispatch(getNextPrayerData());
+  }, [dispatch]);
 
-  const fetchInitialRingerMode = async () => {
-    try {
-      const currentMode = await VolumeManager.getRingerMode();
-      setIsSilentModeEnabled(currentMode === RINGER_MODE.silent);
-    } catch (error) {
-      console.error('Error fetching ringer mode:', error);
+  const scheduleSilentModeForNextPrayer = () => {
+    if (!nextPrayer) return;
+
+    const prayerTime = moment(nextPrayer.time, 'HH:mm');
+    if (prayerTime.isAfter(moment())) {
+      const timeUntilPrayer = prayerTime.diff(moment());
+      console.log(`Scheduling silent mode for ${nextPrayer.name} in ${timeUntilPrayer}ms`);
+
+      BackgroundTimer.setTimeout(() => enableSilentMode(nextPrayer), timeUntilPrayer);
     }
   };
 
-  const scheduleSilentModeForAllPrayers = () => {
-    todayPrayers.forEach(prayer => {
-      const prayerTime = moment(prayer.time, 'HH:mm'); // Exact prayer time
-
-      if (prayerTime.isAfter(moment())) {
-        const timeUntilPrayer = prayerTime.diff(moment());
-        console.log(`Scheduling silent mode for ${prayer.name} in ${timeUntilPrayer}ms`);
-
-        // Schedule silent mode to start at the prayer time
-        BackgroundTimer.setTimeout(() => enableSilentMode(prayer), timeUntilPrayer);
-      }
-    });
-  };
-
   const enableSilentMode = async (prayer) => {
-    const hasPermission = await requestDoNotDisturbPermission();
-    if (!hasPermission) return;
+    if (!(await requestDoNotDisturbPermission())) return;
 
     console.log(`Enabling silent mode for ${prayer.name}`);
     setRingerMode(RINGER_MODE.silent);
-    setIsSilentModeEnabled(true);
+    dispatch(setAutoSilentEnabled(true));
 
-    const silentDuration = 15 * 60 * 1000; // 15 minutes in milliseconds
-
-    // Revert to normal mode after 15 minutes
     BackgroundTimer.setTimeout(() => {
       setRingerMode(RINGER_MODE.normal);
-      setIsSilentModeEnabled(false);
+      dispatch(setAutoSilentEnabled(false));
       console.log(`Reverting to normal mode for ${prayer.name}`);
-    }, silentDuration);
+    }, 15 * 60 * 1000); // 15 minutes
   };
 
   const requestDoNotDisturbPermission = async () => {
@@ -87,47 +73,18 @@ const SettingsScreen = () => {
   };
 
   const handleSilentModeSwitch = async (value) => {
-    const hasPermission = await requestDoNotDisturbPermission();
-    if (!hasPermission) {
-      setIsSilentModeEnabled(false);
+    if (!(await requestDoNotDisturbPermission())) {
+      dispatch(setAutoSilentEnabled(false));
       return;
     }
-    setIsSilentModeEnabled(value);
-    if (value) {
-      scheduleSilentModeForAllPrayers(); // Schedule silent mode when switch is ON
-    }
+    dispatch(setAutoSilentEnabled(value));
+    if (value) scheduleSilentModeForNextPrayer();
   };
 
-  // useEffect(() => {
-  //   if (isReminderEnabled) {
-  //     scheduleAlarmsForNext7Days(weeklyPrayerTimes);
-  //   }
-  // }, [weeklyPrayerTimes, isReminderEnabled]);
-  
-  const preparePrayerData = data => [
-    {name: 'Fajar', time: data.fajar_jamat},
-    {name: 'Zuhar', time: data.zuhar_jamat},
-    {name: 'Asar', time: data.asar_jamat},
-    {name: 'Magrib', time: data.magrib_jamat},
-    {name: 'Isha', time: data.isha_jamat},
-  ];
-
-  const scheduleAlarmsForNext7Days = (prayerTimes) => {
-    prayerTimes.forEach((day) => {
-      const prayers = preparePrayerData(day);
-      prayers.forEach((prayer) => {
-        schedulePrayerAlarms(prayer);
-      });
-    });
-  };
-  
-  // Call it after fetching and filtering
-  
   const handleReminderSwitch = (value) => {
     dispatch(setReminderEnabled(value));
-    if (value) {
-      // schedulePrayerAlarms(todayPrayers);
-      scheduleAlarmsForNext7Days(weeklyPrayerTimes);
+    if (value && nextPrayer) {
+      schedulePrayerAlarms([nextPrayer]);
     } else {
       cancelAllScheduledNotifications();
     }
@@ -164,7 +121,7 @@ const SettingsScreen = () => {
               Automatically silence your mobile at prayer time and stay silent for 15 minutes.
             </Text>
           </View>
-          <Switch value={isSilentModeEnabled} onValueChange={handleSilentModeSwitch} />
+          <Switch value={isAutoSilentEnabled} onValueChange={handleSilentModeSwitch} />
         </View>
       </View>
     </View>

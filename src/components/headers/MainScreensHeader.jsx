@@ -2,7 +2,6 @@ import { Image, StatusBar, StyleSheet, Text, View, ImageBackground, Dimensions }
 import React from 'react';
 import colors from '../../assets/colors/AppColors';
 import fonts from '../../assets/fonts/MyFonts';
-import { appName } from '../../services/constants';
 import MyImages from '../../assets/images/MyImages';
 
 const { height } = Dimensions.get('window')

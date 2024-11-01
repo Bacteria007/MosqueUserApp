@@ -2,7 +2,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  isReminderEnabled: false, // Default to false
+  isReminderEnabled: false, 
+  isAutoSilentEnabled:false
 };
 
 const notificationSlice = createSlice({
@@ -12,8 +13,11 @@ const notificationSlice = createSlice({
     setReminderEnabled(state, action) {
       state.isReminderEnabled = action.payload;
     },
+    setAutoSilentEnabled(state, action) {
+      state.isAutoSilentEnabled = action.payload;
+    },
   },
 });
 
-export const { setReminderEnabled } = notificationSlice.actions;
+export const { setReminderEnabled,setAutoSilentEnabled } = notificationSlice.actions;
 export default notificationSlice.reducer;

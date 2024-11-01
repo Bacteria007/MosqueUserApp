@@ -2,6 +2,7 @@ import notifee, { EventType, TriggerType, TimestampTrigger } from '@notifee/reac
 import { PermissionsAndroid, Platform } from 'react-native';
 import moment from 'moment'; // For time formatting and calculations
 import { appName } from '../services/constants';
+import transformFuturePrayers from './TransformPrayerData';
 
 // Ensure notification permission for Android 13+
 async function requestNotificationPermission() {
@@ -44,11 +45,29 @@ notifee.onForegroundEvent(({ type, detail }) => {
 });
 
 // Check if a notification for a specific prayer is already scheduled
+// async function isNotificationScheduled(prayerName) {
+//   const notifications = await notifee.getTriggerNotifications();
+//   return notifications.some(notification => 
+//     notification.notification.title.includes(prayerName)
+//   );
+// }
+
+// async function isNotificationScheduled(prayerName, prayerDate) {
+//   const notifications = await notifee.getTriggerNotifications();
+
+//   return notifications.some(notification => {
+//     const { title, body } = notification.notification;
+//     const scheduledDate = moment(body.match(/\d{4}-\d{2}-\d{2}/), 'YYYY-MM-DD');
+//     return title.includes(prayerName) && scheduledDate.isSame(prayerDate, 'day');
+//   });
+// }
 async function isNotificationScheduled(prayerName) {
   const notifications = await notifee.getTriggerNotifications();
-  return notifications.some(notification => 
-    notification.notification.title.includes(prayerName)
-  );
+
+  return notifications.some(notification => {
+    const { title } = notification.notification;
+    return title.includes(prayerName);
+  });
 }
 
 // Function to schedule alarms for all prayers in the array
@@ -115,8 +134,6 @@ export async function schedulePrayerAlarms(prayers) {
     }
   }
 }
-
-// Function to cancel all scheduled notifications
 export const cancelAllScheduledNotifications = async () => {
   try {
     const notifications = await notifee.getTriggerNotifications();
@@ -136,23 +153,3 @@ export const cancelAllScheduledNotifications = async () => {
     console.error('Error canceling notifications:', error);
   }
 };
-
-
-export async function scheduleWeeklyPrayerAlarms(weeklyPrayers) {
-  console.log('Scheduling weekly prayer alarms...');
-
-  await requestNotificationPermission(); // Ensure permission
-  const channelId = await createNotificationChannel(); // Create channel
-
-  // Loop through each day and prayer to schedule notifications
-  for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
-    const dateStr = moment().add(dayOffset, 'days').format('YYYY-MM-DD');
-    console.log(`Scheduling prayers for: ${dateStr}`);
-
-    for (const prayer of weeklyPrayers) {
-      await schedulePrayerAlarms(prayer, dayOffset, channelId);
-    }
-  }
-  console.log('All weekly prayer alarms have been scheduled.');
-}
-

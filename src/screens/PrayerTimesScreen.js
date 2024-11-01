@@ -6,13 +6,9 @@ import {
   StyleSheet,
   RefreshControl,
   Pressable,
-  Image,
   ImageBackground,
   Dimensions,
   ScrollView,
-  Platform,
-  Alert,
-  Linking,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import moment from 'moment';
@@ -22,262 +18,204 @@ import MyImages from '../assets/images/MyImages';
 import colors from '../assets/colors/AppColors';
 import fonts from '../assets/fonts/MyFonts';
 import CommonStyles from '../assets/styles/CommonStyles';
-import WhiteStatusbar from '../components/statusbar/WhiteStatusbar';
 import {Icons} from '../assets/icons/Icons';
-
-import {
-  fetchPrayerTimes,
-  setSelectedDate,
-  filterTodayPrayers,
-  filterPrayerTimes,
-  calculateUpcomingAndNextPrayers,
-  calculateWeeklyPrayers,
-} from '../reducers/calendarSlice';
 import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
 import AppHeader from '../components/headers/AppHeader';
 import momenthijri from 'moment-hijri';
-import {schedulePrayerAlarms} from '../utils/PrayerAlarm';
+import { schedulePrayerAlarms} from '../utils/PrayerAlarm';
+import {useFocusEffect} from '@react-navigation/native';
+import {checkAndRequestLocationPermission} from '../utils/LocationPermission';
+import calendarData from '../calendar.json'
 import BackgroundFetch from 'react-native-background-fetch';
-import { useFocusEffect } from '@react-navigation/native';
-import {check, PERMISSIONS, RESULTS} from 'react-native-permissions';
-import DeviceInfo from 'react-native-device-info';
-
+import { fetchPrayerDataForDate, getNextPrayerData } from '../reducers/calendarSlice';
 const {height, width} = Dimensions.get('window');
 const headerCardHeight = height < 630 ? height * 0.2 : height * 0.25;
 
-const initBackgroundFetch = async () => {
-  BackgroundFetch.configure(
-    {
-      minimumFetchInterval: 1440, // Run every 15 minutes
-      stopOnTerminate: false,
-      startOnBoot: true,
-    },
-    async taskId => {
-      console.log('[BackgroundFetch] Fetching today’s prayers...');
-
-      try {
-        await fetchPrayerTimes(); // Dispatch fetch prayer times action
-      } catch (error) {
-        console.error('Error in background fetch:', error);
-      }
-
-      BackgroundFetch.finish(taskId); // Mark task as completed
-    },
-    error => {
-      console.error('[BackgroundFetch] Failed to start:', error);
-    },
-  );
-
-  const status = await BackgroundFetch.status();
-  console.log('[BackgroundFetch] Status:', status);
-};
-
+// screen====
 const PrayerTimesScreen = () => {
-  const dispatch = useDispatch();
+  // const nextPrayer = useSelector(state => state.calendar.nextPrayer);
 
-  const {
-    prayerTimes,
-    filteredPrayerTimes,
-    selectedDate,
-    loading,
-    todayPrayers,
-    upcomingPrayer,
-    weeklyPrayerTimes
-  } = useSelector(state => state.calendar);
+  useEffect(() => {
+    dispatch(getNextPrayerData());
+    dispatch(fetchPrayerDataForDate(moment().format('DD MMMM, YYYY')));
+
+    BackgroundFetch.configure(
+      {
+        minimumFetchInterval: 15,
+        stopOnTerminate: false,
+        startOnBoot: true,
+        enableHeadless: true,
+      },
+      async taskId => {
+        dispatch(getNextPrayerData());
+        
+        if (nextPrayer) {
+          await schedulePrayerAlarms([nextPrayer]);
+        }
+
+        BackgroundFetch.finish(taskId);
+      },
+      error => console.error('[BackgroundFetch] failed to configure:', error)
+    );
+
+    BackgroundFetch.start();
+
+    return () => BackgroundFetch.stop();
+  }, [dispatch, nextPrayer]);
+  // ===========b gservice
+  const dispatch = useDispatch();
   const isReminderEnabled = useSelector(
     state => state.notification.isReminderEnabled,
-  ); // Track reminder state from Redux
-
+  );
+  const [upcomingPrayer, setUpcomingPrayer] = useState({});
+  const [todayPrayers, setTodayPrayers] = useState({});
+  const [nextPrayer, setNextPrayer] = useState({});
   const [date, setDate] = useState(new Date());
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [islamicDate, setIslamicDate] = useState('');
-  
+  const [selectedDate, setSelectedDate] = useState(
+    moment().format('DD MMMM, YYYY'),
+  );
+  const [jumaTimings, setJumaTimings] = useState({khutbah: null, salah: null});
 
-  //  ==== Location start
+
+  useEffect(() => {
+    if (moment().format('dddd') === 'Friday') {
+      const zuhrJamatTime = todayPrayers?.zuhar_jamat;
+
+      if (zuhrJamatTime) {
+        const khutbahTime = moment(zuhrJamatTime, 'HH:mm')
+          .subtract(30, 'minutes')
+          .format('HH:mm');
+        setJumaTimings({khutbah: khutbahTime, salah: zuhrJamatTime});
+      }
+    }
+  }, [todayPrayers]);
+
+    // Update prayer alarms whenever `todayPrayers` changes
+    useEffect(() => {
+      if (todayPrayers) {
+        // Prepare array of prayer objects
+        const prayersArray = [
+          { name: 'Fajr', time: todayPrayers.fajar_jamat },
+          { name: 'Zuhur', time: todayPrayers.zuhar_jamat },
+          { name: 'Asar', time: todayPrayers.asar_jamat },
+          { name: 'Maghrib', time: todayPrayers.magrib_jamat },
+          { name: 'Isha', time: todayPrayers.isha_jamat },
+        ].filter(prayer => prayer.time); // Exclude any prayers without a time
+  
+        // Call schedulePrayerAlarms with the array
+        schedulePrayerAlarms(prayersArray);
+      }
+    }, [todayPrayers]); // Re-run when `todayPrayers` changes
+
+  // ============ Location start
   useFocusEffect(
     React.useCallback(() => {
-      checkAndRequestLocationPermission(); // Re-check location permission on focus
+      checkAndRequestLocationPermission();
     }, []),
   );
-
-  const checkAndRequestLocationPermission = async () => {
-    const permissionStatus = await check(
-      Platform.OS === 'android'
-        ? PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION
-        : PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
-    );
-
-    if (permissionStatus === RESULTS.GRANTED) {
-      checkIfLocationServicesEnabled(); // If permission granted, check GPS
-    } else {
-      requestLocationPermission(); // Request permission if not granted
-    }
-  };
-
-  const checkIfLocationServicesEnabled = async () => {
-    const isLocationEnabled = await DeviceInfo.isLocationEnabled(); // Check if GPS is on
-    if (isLocationEnabled) {
-      // getCurrentLocation(); // Get location if GPS is enabled
-    } else {
-      showEnableLocationAlert(); // Prompt to enable GPS
-    }
-  };
-
-  const requestLocationPermission = async () => {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      {
-        title: 'Location Permission',
-        message:
-          'We need access to your location to show you relevant information.',
-        buttonNeutral: 'Ask Me Later',
-        buttonNegative: 'Cancel',
-        buttonPositive: 'OK',
-      },
-    );
-
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-      checkIfLocationServicesEnabled(); // Check GPS if permission granted
-    } else {
-      console.log('Location permission denied');
-    }
-  };
-  const showEnableLocationAlert = () => {
-    Alert.alert(
-      'Enable Location',
-      'Please enable location services and ensure GPS is on.',
-      [
-        {text: 'Cancel', style: 'cancel'},
-        {
-          text: 'Enable',
-          onPress: () =>
-            Linking.sendIntent(
-              'android.settings.LOCATION_SOURCE_SETTINGS',
-            )
-        },
-      ],
-    );
-  };
-
   // ============ Location End
   useEffect(() => {
+    momenthijri.locale('en');
     const hijriDate = momenthijri().format('iD iMMMM iYYYY'); // Hijri format
     setIslamicDate(hijriDate); // Convert and set date
   }, []);
 
   useEffect(() => {
-    dispatch(fetchPrayerTimes());
-  }, [dispatch]);
-  useEffect(() => {
-    // Initialize background fetch on mount
-    initBackgroundFetch();
-  }, [dispatch]);
-  useEffect(() => {
-    dispatch(filterTodayPrayers());
-    dispatch(filterPrayerTimes());
-  }, [selectedDate, prayerTimes, dispatch]);
+    loadPrayersForDate(selectedDate);
+  }, [selectedDate]);
 
   useEffect(() => {
-    dispatch(calculateUpcomingAndNextPrayers());
-    if (isReminderEnabled && todayPrayers) {
-      const prayerArray = preparePrayerData(todayPrayers);
-      schedulePrayerAlarms(prayerArray);
-    }
-  }, [todayPrayers, isReminderEnabled, dispatch]);
+    calculateUpcomingAndNextPrayers();
+  }, [todayPrayers]);
 
-  // =======
-  useEffect(() => {
-    dispatch(fetchPrayerTimes()).then(() => {
-      dispatch(calculateWeeklyPrayers());
-    });
-  }, [dispatch]);
-  
-  const scheduleAlarmsForNext7Days = (prayerTimes) => {
-    prayerTimes.forEach((day) => {
-      const prayers = preparePrayerData(day);
-      prayers.forEach((prayer) => {
-        schedulePrayerAlarms(prayer);
-      });
-    });
+  const loadPrayersForDate = dateString => {
+    const formattedDate = moment(dateString, 'DD MMMM').format(
+      'D/M',
+    );
+    const prayerTimes =
+      calendarData.find(item => item.date === formattedDate) || {};
+    setTodayPrayers(prayerTimes);
+
+    const hijriDate = momenthijri(moment(dateString, 'DD MMMM, YYYY')).format(
+      'iD iMMMM iYYYY',
+    );
+    setIslamicDate(hijriDate);
   };
-  
-  // Call it after fetching and filtering
-  useEffect(() => {
-    if (isReminderEnabled) {
-      scheduleAlarmsForNext7Days(weeklyPrayerTimes);
-    }
-  }, [weeklyPrayerTimes, isReminderEnabled]);
-  
-  // =======
-  // Utility function to format prayer data
-  const preparePrayerData = data => [
-    {name: 'Fajar', time: data.fajar_jamat},
-    {name: 'Zuhar', time: data.zuhar_jamat},
-    {name: 'Asar', time: data.asar_jamat},
-    {name: 'Magrib', time: data.magrib_jamat},
-    {name: 'Isha', time: data.isha_jamat},
-  ];
 
-  const calculateRemainingTime = prayerTime => {
-    if (!prayerTime) return '';
+  const calculateUpcomingAndNextPrayers = () => {
+    if (!todayPrayers || Object.keys(todayPrayers).length === 0) {
+      setUpcomingPrayer(null);
+      setNextPrayer(null);
+      return;
+    }
+
+    const prayerSchedule = [
+      {name: 'Fajr', time: todayPrayers.fajar_jamat},
+      {name: 'Zuhur', time: todayPrayers.zuhar_jamat},
+      {name: 'Asar', time: todayPrayers.asar_jamat},
+      {name: 'Maghrib', time: todayPrayers.magrib_jamat},
+      {name: 'Isha', time: todayPrayers.isha_jamat},
+    ];
 
     const currentTime = moment();
-    let prayerTimeMoment = moment(prayerTime, 'HH:mm');
+    let foundUpcoming = false;
 
-    if (prayerTimeMoment.isBefore(currentTime)) {
-      prayerTimeMoment.add(1, 'day');
+    for (let i = 0; i < prayerSchedule.length; i++) {
+      const prayerTime = moment(prayerSchedule[i].time, 'HH:mm');
+      if (prayerTime.isAfter(currentTime) && !foundUpcoming) {
+        setUpcomingPrayer(prayerSchedule[i]);
+        setNextPrayer(prayerSchedule[i + 1] || prayerSchedule[0]);
+        foundUpcoming = true;
+      }
     }
 
-    const duration = moment.duration(prayerTimeMoment.diff(currentTime));
-
-    // Extract hours and minutes from the duration
-    const hours = Math.floor(duration.asHours());
-    const minutes = duration.minutes();
-
-    // Format the remaining time as "Xh Ym"
-    return `${hours}h ${minutes} mins`;
-  };
-  // const handleDateChange = (newDate) => {
-  //   setSelectedDate(moment(newDate).format('DD MMMM, YYYY'));
-  // const updatedHijriDate = moment(newDate).format('iD iMMMM iYYYY');
-  // setIslamicDate(updatedHijriDate);
-  // };
-  const handleCalendarDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
-    setDatePickerVisibility(false);
-    setDate(currentDate);
-    const updatedHijriDate = momenthijri(selectedDate).format('iD iMMMM iYYYY');
-    setIslamicDate(updatedHijriDate);
-    dispatch(setSelectedDate(moment(currentDate).format('DD MMMM, YYYY')));
+    if (!foundUpcoming) {
+      setUpcomingPrayer(prayerSchedule[0]);
+      setNextPrayer(prayerSchedule[1]);
+    }
   };
 
   const handleDateChange = newDate => {
-    const updatedHijriDate = momenthijri(newDate).format('iD iMMMM iYYYY');
-    setIslamicDate(updatedHijriDate);
-
-    setDate(newDate);
-    dispatch(setSelectedDate(moment(newDate).format('DD MMMM, YYYY')));
+    const newDateString = moment(newDate).format('DD MMMM, YYYY');
+    setSelectedDate(newDateString);
+    loadPrayersForDate(newDateString);
   };
+  const filterTodayPrayers = () => {
+    const todayDate = moment().format('DD MMMM, YYYY');
+    setSelectedDate(todayDate);
+    loadPrayersForDate(todayDate);
+  };
+  
   const goToPreviousDate = () => {
     const previousDate = moment(selectedDate, 'DD MMMM, YYYY')
       .subtract(1, 'day')
-      .toDate(); // Convert back to Date
+      .toDate();
     handleDateChange(previousDate);
   };
 
   const goToNextDate = () => {
     const nextDate = moment(selectedDate, 'DD MMMM, YYYY')
       .add(1, 'day')
-      .toDate(); // Convert back to Date
+      .toDate();
     handleDateChange(nextDate);
   };
 
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
-  };
+  const calculateRemainingTime = prayerTime => {
+    if (!prayerTime) return '';
+    const currentTime = moment();
+    const prayerMoment = moment(prayerTime, 'HH:mm');
 
-  const onRefresh = async () => {
-    dispatch(fetchPrayerTimes()); // Dispatch action to re-fetch prayer times
+    if (prayerMoment.isBefore(currentTime)) {
+      prayerMoment.add(1, 'day');
+    }
+
+    const duration = moment.duration(prayerMoment.diff(currentTime));
+    const hours = Math.floor(duration.asHours());
+    const minutes = duration.minutes();
+
+    return `${hours}h ${minutes} mins`;
   };
 
   const formatTimeTo12Hour = time => {
@@ -286,6 +224,15 @@ const PrayerTimesScreen = () => {
     const formattedHour = hour % 12 || 12;
     const period = hour >= 12 ? 'PM' : 'AM';
     return `${formattedHour}:${minute} ${period}`;
+  };
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+  // calendar end
+
+  const onRefresh = async () => {
+    filterTodayPrayers();
   };
 
   const renderPrayerItem = (item, prayerName, azanTime, jamatTime) => {
@@ -297,7 +244,7 @@ const PrayerTimesScreen = () => {
       <View
         style={[
           styles.prayerItem,
-          isNextPrayer && {backgroundColor: colors.primary},
+          isNextPrayer && {backgroundColor: colors.primary}, //#f3c306
         ]}>
         <Text
           style={[
@@ -327,24 +274,27 @@ const PrayerTimesScreen = () => {
 
   const refreshToToday = () => {
     const today = moment().format('DD MMMM, YYYY');
-    dispatch(setSelectedDate(today));
-    dispatch(filterTodayPrayers());
+    setSelectedDate(today);
+    filterTodayPrayers();
   };
-
+  const handleCalendarDateChange = (event, selectedDate) => {
+    // If no date is selected, maintain the current date
+    const currentDate = selectedDate || date;
+    setDatePickerVisibility(false); // Close the date picker
+  
+    // Format the date and update states
+    const newDateString = moment(currentDate).format('DD MMMM');
+    setDate(currentDate);
+    setSelectedDate(newDateString);
+    loadPrayersForDate(newDateString); // Load prayer times for the selected date
+  
+    // Update Hijri date
+    const hijriDate = momenthijri(currentDate).format('iD iMMMM iYYYY');
+    setIslamicDate(hijriDate);
+  };
+  
   const isToday = selectedDate == moment().format('DD MMMM, YYYY');
 
-  if (loading) {
-    return (
-      <View style={styles.overlay}>
-        <LottieView
-          style={{height: 80, width: 80}}
-          source={MyImages.loading2}
-          autoPlay
-          loop={true}
-        />
-      </View>
-    );
-  }
   return (
     <View style={CommonStyles.container}>
       <TransparentStatusbar />
@@ -438,8 +388,8 @@ const PrayerTimesScreen = () => {
           <DateTimePicker
             value={date}
             mode="date"
-            minimumDate={new Date(2024, 0, 1)}
-            maximumDate={new Date(2024, 11, 31)}
+            // minimumDate={new Date(2024, 0, 1)}
+            // maximumDate={new Date(2024, 11, 31)}
             display="default"
             onChange={handleCalendarDateChange}
           />
@@ -447,8 +397,8 @@ const PrayerTimesScreen = () => {
 
         {/* Prayer Times */}
         <FlatList
-          data={filteredPrayerTimes ? [filteredPrayerTimes] : []}
-          keyExtractor={item => item._id}
+          data={todayPrayers ? [todayPrayers] : []}
+          keyExtractor={(_, index) => index.toString()}
           ListHeaderComponent={() => (
             <View style={styles.listHeaderItem}>
               <Text style={[styles.headerTitle, {textAlign: 'left'}]}>
@@ -496,6 +446,29 @@ const PrayerTimesScreen = () => {
             <RefreshControl refreshing={false} onRefresh={onRefresh} />
           }
         />
+        {/* show this if today is friday and the khutba time is the zuhar jamat time minus 30 minus and juma salah is the zuhar time */}
+        {moment().format('dddd') === 'Friday' && jumaTimings.khutbah && (
+          <>
+            <View style={styles.jumaheading}>
+              <Icons.Feather name="clock" size={20} color={colors.primary} />
+              <Text style={styles.jumaheadingtxt}>Jumu'ah Time</Text>
+            </View>
+            <View style={styles.jumaitme}>
+              <View style={styles.jumaheader}>
+                <Text style={styles.jumatitle}>Khutbah</Text>
+                <Text style={styles.jumatitle}>Salah</Text>
+              </View>
+              <View style={styles.jumatimecontainer}>
+                <Text style={styles.jumatimetext}>
+                  {formatTimeTo12Hour(jumaTimings.khutbah)}
+                </Text>
+                <Text style={styles.jumatimetext}>
+                  {formatTimeTo12Hour(jumaTimings.salah)}
+                </Text>
+              </View>
+            </View>
+          </>
+        )}
       </ScrollView>
     </View>
   );
@@ -510,8 +483,8 @@ const styles = StyleSheet.create({
     // paddingTop: StatusBar.currentHeight,
   },
   overlayContainer: {
-    ...StyleSheet.absoluteFillObject, // Makes the overlay cover the entire ImageBackground
-    backgroundColor: 'rgba(0, 0, 0, 0.4)', // Semi-transparent black
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -568,7 +541,7 @@ const styles = StyleSheet.create({
     shadowColor: colors.teal,
     shadowOffset: {width: 0, height: 4},
     shadowRadius: 5,
-    elevation:  height > 630 ? 4 : 2,
+    elevation: height > 630 ? 4 : 2,
     marginTop: 10,
   },
   prayerItem: {
@@ -586,6 +559,52 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: height > 630 ? 4 : 2,
     marginBottom: 20,
+  },
+  jumaitme: {
+    width: '90%',
+    alignSelf: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.bg_clr,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 8,
+    shadowColor: colors.primary,
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+    elevation: height > 630 ? 4 : 2,
+    marginBottom: 20,
+  },
+  jumaheader: {
+    borderBlockColor: colors.lighr_grey,
+    borderBottomWidth: 1,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingBottom: 5,
+  },
+  jumaheading: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'center',
+    gap: 10,
+    marginBottom: 10,
+  },
+  jumaheadingtxt: {
+    fontSize: 16,
+    fontFamily: fonts.bold,
+    color: colors.primary,
+  },
+  jumatitle: {
+    fontSize: 16,
+    color: colors.primary,
+    fontFamily: fonts.bold,
+  },
+  jumatimecontainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingTop: 5,
   },
   headerTitle: {
     fontSize: 16,
@@ -617,6 +636,11 @@ const styles = StyleSheet.create({
     fontFamily: fonts.normal,
     flex: 1,
     textAlignVertical: 'top',
+  },
+  jumatimetext: {
+    fontSize: 14,
+    color: colors.black,
+    fontFamily: fonts.bold,
   },
   prayerTimeText: {
     fontSize: 14,

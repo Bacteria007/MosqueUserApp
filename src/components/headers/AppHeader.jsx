@@ -29,11 +29,11 @@ const AppHeader = () => {
                     resizeMode="contain"
                 />
                 <Text style={styles.title} ellipsizeMode="tail">
-                    {appName}
+                    Markazi Jamia Ghausia Masjid{'\n'}<Text style={{textAlign:'center',fontSize:14,fontFamily:fonts.semibold}}>& Ghausia Madrassa</Text>
                 </Text>
             </View>
             <Pressable onPress={() => navigation.openDrawer()} style={styles.iconContainer}>
-                <Icons.Ionicons name="menu" size={22} color={colors.black} />
+                <Icons.Ionicons name="menu" size={22} color={colors.black}/>
             </Pressable>
         </View>
     );
@@ -62,9 +62,14 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: colors.black,
         fontFamily: fonts.semibold,
-        marginLeft:-5
+        marginLeft: -5,
+        textAlign:'center'
     },
     iconContainer: {
-        padding: 8,
+        paddingHorizontal: 8,
+        justifyContent:'flex-start',
+        alignItems:'flex-start',
+        marginBottom:10
+        // backgroundColor:'red'
     },
 });

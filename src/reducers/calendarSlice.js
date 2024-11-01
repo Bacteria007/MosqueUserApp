@@ -1,137 +1,66 @@
-import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
-import ApiService from '../services/api';
-import {prayerTimesURL} from '../services/constants';
+import { createSlice } from '@reduxjs/toolkit';
 import moment from 'moment';
-import {schedulePrayerAlarms} from '../utils/PrayerAlarm';
-
-// Fetch prayer times asynchronously
-export const fetchPrayerTimes = createAsyncThunk(
-  'calendar/fetchPrayerTimes',
-  async () => {
-    const response = await ApiService({method: 'GET', url: prayerTimesURL});
-    return response.data;
-  },
-);
+import calendarData from '../calendar.json';
 
 const calendarSlice = createSlice({
   name: 'calendar',
   initialState: {
-    prayerTimes: [],
-    weeklyPrayerTimes: [],
-    todayPrayers: {},
-    filteredPrayerTimes: {},
-    upcomingPrayer: null,
+    prayerData: null,
     nextPrayer: null,
-    selectedDate: moment().format('DD MMMM, YYYY'),
     loading: false,
     error: null,
   },
   reducers: {
-    setSelectedDate: (state, action) => {
-      state.selectedDate = action.payload;
-    },
-    filterTodayPrayers: state => {
-      const today = moment().format('DD MMMM, YYYY');
-      state.todayPrayers =
-        state.prayerTimes.find(
-          item => moment(item.date).format('DD MMMM, YYYY') == today,
-        ) || {};
-    },
-    filterPrayerTimes: state => {
-      state.filteredPrayerTimes =
-        state.prayerTimes.find(
-          item =>
-            moment(item.date).format('DD MMMM, YYYY') == state.selectedDate,
-        ) || {};
-    },
-    calculateUpcomingAndNextPrayers: state => {
-      const times = state.todayPrayers;
+    fetchPrayerDataForDate: (state, action) => {
+      const dateString = action.payload;
+      const formattedDate = moment(dateString, 'DD MMMM, YYYY').format('D/M');
+      const prayerData = calendarData.find(item => item.date === formattedDate);
 
-      if (!times || Object.keys(times).length === 0) {
-        console.log('No prayer times available for today.');
-        return;
-      }
-
-      const prayerTimes = [
-        {name: 'Fajr', time: times.fajar_jamat},
-        {name: 'Zuhur', time: times.zuhar_jamat},
-        {name: 'Asr', time: times.asar_jamat},
-        {name: 'Maghrib', time: times.magrib_jamat},
-        {name: 'Isha', time: times.isha_jamat},
-      ];
-
-      const currentTime = moment();
-      console.log('Current time:', currentTime.format('HH:mm'));
-
-      let upcoming = null;
-      let next = null;
-      const remainingPrayers = [];
-
-      for (let i = 0; i < prayerTimes.length; i++) {
-        const prayerTime = moment(prayerTimes[i].time, 'HH:mm');
-
-        console.log(
-          `${prayerTimes[i].name} prayer time: ${prayerTime.format('HH:mm')}`,
-        );
-
-        if (prayerTime.isAfter(currentTime)) {
-          if (!upcoming) {
-            upcoming = prayerTimes[i];
-            next = prayerTimes[i + 1] || prayerTimes[0];
-          }
-          remainingPrayers.push(prayerTimes[i]);
-        }
-      }
-
-      state.upcomingPrayer = upcoming || prayerTimes[0];
-      state.nextPrayer = next || prayerTimes[1];
-
-      // console.log('Upcoming prayer object:', state.upcomingPrayer);
-
-      console.log(
-        `Next prayer: ${state.nextPrayer ? state.nextPrayer.name : 'None'}`,
-      );
-
-      if (remainingPrayers.length > 0) {
-        console.log('Remaining prayers for notifications:', remainingPrayers);
-        // schedulePrayerAlarms(remainingPrayers);
-      }
-    },
-    calculateWeeklyPrayers: (state) => {
-      const today = moment(); // Today's date
-      const nextSevenDays = moment().add(7, 'days'); // Date 7 days from today
-    
-      state.weeklyPrayerTimes = state.prayerTimes.filter((item) => {
-        const prayerDate = moment(item.date, 'YYYY-MM-DD'); // Assuming date format is 'YYYY-MM-DD'
-        return prayerDate.isBetween(today, nextSevenDays, null, '[]'); // Check if within the next 7 days
-      });
-    
-      console.log('Next 7 days prayer times:', state.weeklyPrayerTimes);
-    }, 
-  },
-  extraReducers: builder => {
-    builder
-      .addCase(fetchPrayerTimes.pending, state => {
-        state.loading = true;
+      if (prayerData) {
+        state.prayerData = {
+          date: dateString,
+          prayerTimes: [
+            { name: 'Fajr', time: prayerData.fajar_jamat },
+            { name: 'Zuhur', time: prayerData.zuhar_jamat },
+            { name: 'Asar', time: prayerData.asar_jamat },
+            { name: 'Maghrib', time: prayerData.magrib_jamat },
+            { name: 'Isha', time: prayerData.isha_jamat },
+          ],
+        };
         state.error = null;
-      })
-      .addCase(fetchPrayerTimes.fulfilled, (state, action) => {
-        state.loading = false;
-        state.prayerTimes = action.payload;
-      })
-      .addCase(fetchPrayerTimes.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message;
-      });
+      } else {
+        state.prayerData = null;
+        state.error = `No prayer data found for ${dateString}`;
+      }
+    },
+    getNextPrayerData: (state) => {
+      const todayDate = moment().format('D/M');
+      const todayPrayers = calendarData.find(item => item.date === todayDate);
+
+      if (todayPrayers) {
+        const prayerSchedule = [
+          { name: 'Fajr', time: todayPrayers.fajar_jamat },
+          { name: 'Zuhur', time: todayPrayers.zuhar_jamat },
+          { name: 'Asar', time: todayPrayers.asar_jamat },
+          { name: 'Maghrib', time: todayPrayers.magrib_jamat },
+          { name: 'Isha', time: todayPrayers.isha_jamat },
+        ];
+
+        const currentTime = moment();
+        for (const prayer of prayerSchedule) {
+          const prayerTime = moment(prayer.time, 'HH:mm');
+          if (prayerTime.isAfter(currentTime)) {
+            state.nextPrayer = prayer;
+            return;
+          }
+        }
+        state.nextPrayer = prayerSchedule[0]; // Wrap around to the first prayer if all have passed
+      } else {
+        state.nextPrayer = null;
+      }
+    },
   },
 });
 
-export const {
-  setSelectedDate,
-  filterTodayPrayers,
-  filterPrayerTimes,
-  calculateUpcomingAndNextPrayers,
-  calculateWeeklyPrayers
-} = calendarSlice.actions;
-
+export const { fetchPrayerDataForDate, getNextPrayerData } = calendarSlice.actions;
 export default calendarSlice.reducer;

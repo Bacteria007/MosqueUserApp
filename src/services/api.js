@@ -31,7 +31,7 @@ export default async function ApiService({
     'Content-Type': 'application/json',
   },
 }) {
-  console.log('API Service Call', {method, url, data, params, headers});
+  // console.log('API Service Call', {method, url, data, params, headers});
   const options = {
     method,
     url,
@@ -42,7 +42,7 @@ export default async function ApiService({
 
   try {
     const response = await api(options);
-    console.log('API Response:', response.data);
+    // console.log('API Response:', response.data);
     if (response.data.status) {
       return response.data;
     } else {
