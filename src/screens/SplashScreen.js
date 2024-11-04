@@ -48,17 +48,16 @@ const SplashScreen = () => {
         index: 0,
         routes: [{name: 'MainNavigator'}],
       });
-    }, 3000);
+    }, 1400);
     return () => clearTimeout(timer);
   }, []);
 
   return (
-    // <View style={styles.container}>
       <LinearGradient
       colors={['#042334', '#006665',]}
       style={styles.container} 
     >
-      <WhiteStatusbar />
+     
       <View style={{alignItems: 'center', justifyContent: 'center'}}>
         <Image
           source={MyImages.logo_trans}

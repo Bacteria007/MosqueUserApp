@@ -1,26 +1,10 @@
-import React, {useEffect, useState} from 'react';
-import {
-  View,
-  TextInput,
-  Button,
-  StyleSheet,
-  Text,
-  ActivityIndicator,
-  Alert,
-  Image,
-  ScrollView,
-  Keyboard,
-  KeyboardAvoidingView,
-} from 'react-native';
+import React, {useState} from 'react';
+import {View, StyleSheet, Text, ScrollView} from 'react-native';
 import api from '../services/api';
 import CommonStyles from '../assets/styles/CommonStyles';
 import AuthTextinput from '../components/inputs/AuthTextinput';
-import YellowBtn from '../components/buttons/YellowBtn';
-import MyImages from '../assets/images/MyImages';
-import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
 import colors from '../assets/colors/AppColors';
 import fonts from '../assets/fonts/MyFonts';
-import WhiteStatusbar from '../components/statusbar/WhiteStatusbar';
 import PrimaryButton from '../components/buttons/PrimaryButton';
 import AuthHeader from '../components/headers/AuthHeader';
 

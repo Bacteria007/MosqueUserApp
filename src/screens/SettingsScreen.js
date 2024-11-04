@@ -1,56 +1,77 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Switch, StyleSheet, Alert } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { VolumeManager, RINGER_MODE, setRingerMode } from 'react-native-volume-manager';
 import BackgroundTimer from 'react-native-background-timer';
+import BackgroundFetch from 'react-native-background-fetch';
 import moment from 'moment';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import { cancelAllScheduledNotifications, schedulePrayerAlarms } from '../utils/PrayerAlarm';
+import { cancelAllScheduledNotifications, schedulePrayerAlarms } from '../utils/NotificationUtils';
 import { setAutoSilentEnabled, setReminderEnabled } from '../reducers/notificationSlice';
-import { getNextPrayerData } from '../reducers/calendarSlice';
 import CommonStyles from '../assets/styles/CommonStyles';
 import colors from '../assets/colors/AppColors';
 import MainScreensHeader from '../components/headers/MainScreensHeader';
 import fonts from '../assets/fonts/MyFonts';
 import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
 import AppHeader from '../components/headers/AppHeader';
+import calendarData from '../calendar.json';
 
 const SettingsScreen = () => {
   const isReminderEnabled = useSelector(state => state.notification.isReminderEnabled);
   const isAutoSilentEnabled = useSelector(state => state.notification.isAutoSilentEnabled);
-  const nextPrayer = useSelector(state => state.calendar.nextPrayer);
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const [todayPrayers, setTodayPrayers] = useState([]);
+  const [nextPrayer, setNextPrayer] = useState(null);
 
   useEffect(() => {
-    // Get the next prayer data upon component mount
-    dispatch(getNextPrayerData());
-  }, [dispatch]);
+    loadTodayPrayers();
+    calculateNextPrayer();
+  }, []);
+
+  const loadTodayPrayers = () => {
+    const todayDate = moment().format('D/M');
+    const todayPrayerData = calendarData.find(item => item.date === todayDate);
+
+    if (todayPrayerData) {
+      const prayers = [
+        { name: 'Fajr', time: todayPrayerData.sehri_end },
+        { name: 'Zuhr', time: todayPrayerData.zuhar_begin },
+        { name: 'Asr', time: todayPrayerData.asar_begin },
+        { name: 'Maghrib', time: todayPrayerData.magrib_jamat },
+        { name: 'Isha', time: todayPrayerData.isha_begin },
+      ];
+      setTodayPrayers(prayers);
+    } else {
+      console.error('No prayer data found for today');
+    }
+  };
+
+  const calculateNextPrayer = () => {
+    const currentTime = moment();
+    const next = todayPrayers.find(prayer => moment(prayer.time, 'HH:mm').isAfter(currentTime));
+    setNextPrayer(next || todayPrayers[0]);
+  };
 
   const scheduleSilentModeForNextPrayer = () => {
     if (!nextPrayer) return;
-
     const prayerTime = moment(nextPrayer.time, 'HH:mm');
     if (prayerTime.isAfter(moment())) {
       const timeUntilPrayer = prayerTime.diff(moment());
-      console.log(`Scheduling silent mode for ${nextPrayer.name} in ${timeUntilPrayer}ms`);
-
       BackgroundTimer.setTimeout(() => enableSilentMode(nextPrayer), timeUntilPrayer);
     }
   };
 
-  const enableSilentMode = async (prayer) => {
-    if (!(await requestDoNotDisturbPermission())) return;
-
-    console.log(`Enabling silent mode for ${prayer.name}`);
-    setRingerMode(RINGER_MODE.silent);
-    dispatch(setAutoSilentEnabled(true));
-
+  const enableSilentMode = async prayer => {
+    const permissionGranted = await requestDoNotDisturbPermission();
+    if (!permissionGranted) return;
+    setRingerMode(RINGER_MODE.silent).then(() => {
+      dispatch(setAutoSilentEnabled(true));
+    });
     BackgroundTimer.setTimeout(() => {
-      setRingerMode(RINGER_MODE.normal);
-      dispatch(setAutoSilentEnabled(false));
-      console.log(`Reverting to normal mode for ${prayer.name}`);
+      setRingerMode(RINGER_MODE.normal).then(() => {
+        dispatch(setAutoSilentEnabled(false));
+      });
     }, 15 * 60 * 1000); // 15 minutes
   };
 
@@ -61,7 +82,7 @@ const SettingsScreen = () => {
         Alert.alert(
           'Do Not Disturb Permission',
           'This app requires permission to modify Do Not Disturb settings.',
-          [{ text: 'OK', onPress: () => VolumeManager.requestDndAccess() }]
+          [{ text: 'OK', onPress: () => VolumeManager.requestDndAccess() }],
         );
         return false;
       }
@@ -72,7 +93,7 @@ const SettingsScreen = () => {
     }
   };
 
-  const handleSilentModeSwitch = async (value) => {
+  const handleSilentModeSwitch = async value => {
     if (!(await requestDoNotDisturbPermission())) {
       dispatch(setAutoSilentEnabled(false));
       return;
@@ -81,22 +102,34 @@ const SettingsScreen = () => {
     if (value) scheduleSilentModeForNextPrayer();
   };
 
-  const handleReminderSwitch = (value) => {
+  const handleReminderSwitch = async value => {
     dispatch(setReminderEnabled(value));
-    if (value && nextPrayer) {
-      schedulePrayerAlarms([nextPrayer]);
+    if (value && todayPrayers) {
+      await startBackgroundFetch();
+      await schedulePrayerAlarms(); // Schedule alarms for today's prayers
     } else {
-      cancelAllScheduledNotifications();
+      cancelAllScheduledNotifications(); // Cancel all notifications if toggled off
+      BackgroundFetch.stop();
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await AsyncStorage.removeItem('token');
-      navigation.reset({ index: 0, routes: [{ name: 'AuthNavigator', params: { screen: 'Login' } }] });
-    } catch (error) {
-      console.error('Error during logout:', error);
-    }
+  const startBackgroundFetch = () => {
+    BackgroundFetch.configure(
+      {
+        minimumFetchInterval: 720,
+        forceAlarmManager: true,
+        stopOnTerminate: false,
+        startOnBoot: true,
+        enableHeadless: true,
+      },
+      async taskId => {
+        await schedulePrayerAlarms();
+        BackgroundFetch.finish(taskId);
+      },
+      error => console.error('[BackgroundFetch] configure error:', error),
+    );
+
+    BackgroundFetch.start();
   };
 
   return (

@@ -1,32 +1,12 @@
-import React, {useEffect, useState} from 'react';
-import {
-  View,
-  TextInput,
-  Button,
-  StyleSheet,
-  Text,
-  ActivityIndicator,
-  Alert,
-  TouchableOpacity,
-  Image,
-  ScrollView,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
+import React, {useState} from 'react';
+import {View, StyleSheet, Text, ScrollView} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {signup} from '../reducers/authSlice';
-import axios from 'axios';
 import CommonStyles from '../assets/styles/CommonStyles';
 import AuthTextinput from '../components/inputs/AuthTextinput';
-import YellowBtn from '../components/buttons/YellowBtn';
 import colors from '../assets/colors/AppColors';
 import fonts from '../assets/fonts/MyFonts';
-import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
-import MyImages from '../assets/images/MyImages';
-import WhiteStatusbar from '../components/statusbar/WhiteStatusbar';
 import PrimaryButton from '../components/buttons/PrimaryButton';
-import Toast from 'react-native-toast-message';
 import AuthHeader from '../components/headers/AuthHeader';
 
 const SignupScreen = ({navigation}) => {
@@ -76,8 +56,8 @@ const SignupScreen = ({navigation}) => {
 
     if (signupResult.type == '/auth/register/rejected') {
     } else {
-      setEmail('')
-      setPassword('')
+      setEmail('');
+      setPassword('');
       navigation.reset({
         index: 0,
         routes: [{name: 'MainNavigator'}],
@@ -88,7 +68,7 @@ const SignupScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <AuthHeader title={'Create Account'}/>
+      <AuthHeader title={'Create Account'} />
       <View style={CommonStyles.authBottomConatiner}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <AuthTextinput
@@ -165,7 +145,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: fonts.normal,
     marginBottom: 20,
-
   },
   bold: {
     color: colors.img1,

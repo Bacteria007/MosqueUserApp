@@ -20,8 +20,5 @@ const colors = {
   img3:'#147985',
   img1:'#1b879f',
   img4:'#042334',
-  img2:'#006665',
-  img5:'#044154',
-  // g1:'#01505d',
 };
 export default colors;

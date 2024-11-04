@@ -44,23 +44,6 @@ notifee.onForegroundEvent(({ type, detail }) => {
   }
 });
 
-// Check if a notification for a specific prayer is already scheduled
-// async function isNotificationScheduled(prayerName) {
-//   const notifications = await notifee.getTriggerNotifications();
-//   return notifications.some(notification => 
-//     notification.notification.title.includes(prayerName)
-//   );
-// }
-
-// async function isNotificationScheduled(prayerName, prayerDate) {
-//   const notifications = await notifee.getTriggerNotifications();
-
-//   return notifications.some(notification => {
-//     const { title, body } = notification.notification;
-//     const scheduledDate = moment(body.match(/\d{4}-\d{2}-\d{2}/), 'YYYY-MM-DD');
-//     return title.includes(prayerName) && scheduledDate.isSame(prayerDate, 'day');
-//   });
-// }
 async function isNotificationScheduled(prayerName) {
   const notifications = await notifee.getTriggerNotifications();
 
@@ -71,7 +54,7 @@ async function isNotificationScheduled(prayerName) {
 }
 
 // Function to schedule alarms for all prayers in the array
-export async function schedulePrayerAlarms(prayers) {
+export async function schedulePrayerAlarms1(prayers) {
   console.log('Notification data:', prayers);
 
   // Request notification permission

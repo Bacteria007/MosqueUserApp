@@ -14,7 +14,7 @@ import colors from '../assets/colors/AppColors';
 import fonts from '../assets/fonts/MyFonts';
 import {useNavigation} from '@react-navigation/native';
 import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
-import YellowBtn from '../components/buttons/YellowBtn';
+import PrimaryButton from '../components/buttons/PrimaryButton';
 
 const WelcomeScreen = () => {
   const mosqueName = 'Islamic Mosque';
@@ -35,11 +35,11 @@ const WelcomeScreen = () => {
         </View>
 
         <View style={styles.textsContainer}>
-          <YellowBtn
+          <PrimaryButton
             title={'Login'}
             onPress={navigateLogin} loader={false}>
             <Text style={styles.btnTitle}>Login</Text>
-          </YellowBtn>
+          </PrimaryButton>
           <Pressable
             style={[styles.btnSignup, styles.btnSize]}
             onPress={navigateSignup}>

@@ -44,7 +44,7 @@ export default AppHeader;
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
-        marginTop: StatusBar.currentHeight + 10,
+        marginTop: 10,
         height: 55,
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -66,10 +66,12 @@ const styles = StyleSheet.create({
         textAlign:'center'
     },
     iconContainer: {
-        paddingHorizontal: 8,
-        justifyContent:'flex-start',
-        alignItems:'flex-start',
-        marginBottom:10
+        marginRight: 10,
+        justifyContent:'flex-end',
+        alignItems:'flex-end',
+        marginBottom:10,
+        flex:1,
+
         // backgroundColor:'red'
     },
 });

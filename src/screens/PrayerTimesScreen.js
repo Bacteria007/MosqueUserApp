@@ -22,7 +22,7 @@ import {Icons} from '../assets/icons/Icons';
 import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
 import AppHeader from '../components/headers/AppHeader';
 import momenthijri from 'moment-hijri';
-import { schedulePrayerAlarms} from '../utils/PrayerAlarm';
+import { schedulePrayerAlarms1} from '../utils/PrayerAlarm';
 import {useFocusEffect} from '@react-navigation/native';
 import {checkAndRequestLocationPermission} from '../utils/LocationPermission';
 import calendarData from '../calendar.json'
@@ -50,7 +50,7 @@ const PrayerTimesScreen = () => {
         dispatch(getNextPrayerData());
         
         if (nextPrayer) {
-          await schedulePrayerAlarms([nextPrayer]);
+          await schedulePrayerAlarms1([nextPrayer]);
         }
 
         BackgroundFetch.finish(taskId);
@@ -74,7 +74,7 @@ const PrayerTimesScreen = () => {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [islamicDate, setIslamicDate] = useState('');
   const [selectedDate, setSelectedDate] = useState(
-    moment().format('DD MMMM, YYYY'),
+    moment().format('DD MMMM'),
   );
   const [jumaTimings, setJumaTimings] = useState({khutbah: null, salah: null});
 
@@ -105,7 +105,7 @@ const PrayerTimesScreen = () => {
         ].filter(prayer => prayer.time); // Exclude any prayers without a time
   
         // Call schedulePrayerAlarms with the array
-        schedulePrayerAlarms(prayersArray);
+        schedulePrayerAlarms1(prayersArray);
       }
     }, [todayPrayers]); // Re-run when `todayPrayers` changes
 
@@ -283,7 +283,7 @@ const PrayerTimesScreen = () => {
     setDatePickerVisibility(false); // Close the date picker
   
     // Format the date and update states
-    const newDateString = moment(currentDate).format('DD MMMM');
+    const newDateString = moment(currentDate).format('DD MMMM,YYYY');
     setDate(currentDate);
     setSelectedDate(newDateString);
     loadPrayersForDate(newDateString); // Load prayer times for the selected date
@@ -446,7 +446,6 @@ const PrayerTimesScreen = () => {
             <RefreshControl refreshing={false} onRefresh={onRefresh} />
           }
         />
-        {/* show this if today is friday and the khutba time is the zuhar jamat time minus 30 minus and juma salah is the zuhar time */}
         {moment().format('dddd') === 'Friday' && jumaTimings.khutbah && (
           <>
             <View style={styles.jumaheading}>

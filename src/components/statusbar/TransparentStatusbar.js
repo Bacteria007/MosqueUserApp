@@ -1,13 +1,10 @@
 import {StatusBar} from 'react-native';
 import React from 'react';
+import colors from '../../assets/colors/AppColors';
 
 const TransparentStatusbar = () => {
   return (
-    <StatusBar
-      backgroundColor={'transparent'}
-      translucent
-      barStyle={'dark-content'}
-    />
+    <StatusBar backgroundColor={colors.bg_clr} barStyle={'dark-content'} />
   );
 };
 
