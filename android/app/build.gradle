@@ -32,6 +32,12 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        // release {
+        // storeFile file(MYAPP_UPLOAD_STORE_FILE)
+        // storePassword MYAPP_UPLOAD_STORE_PASSWORD
+        // keyAlias MYAPP_UPLOAD_KEY_ALIAS
+        // keyPassword MYAPP_UPLOAD_KEY_PASSWORD
+        // }
     }
 
     buildTypes {
@@ -39,8 +45,8 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            // Ensure both minifyEnabled and shrinkResources are correctly set.
-            minifyEnabled enableProguardInReleaseBuilds
+        //    signingConfig signingConfigs.release
+             minifyEnabled enableProguardInReleaseBuilds
             shrinkResources enableProguardInReleaseBuilds
 
             signingConfig signingConfigs.debug

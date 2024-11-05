@@ -6,25 +6,29 @@ const calendarSlice = createSlice({
   name: 'calendar',
   initialState: {
     prayerData: null,
+    calendar:[],
     nextPrayer: null,
     loading: false,
     error: null,
   },
   reducers: {
+    getCalendar:(state)=>{
+      state.calendar=calendarData;
+    },
     fetchPrayerDataForDate: (state, action) => {
       const dateString = action.payload;
-      const formattedDate = moment(dateString, 'DD MMMM, YYYY').format('D/M');
+      const formattedDate = moment(dateString, 'DD MMMM, YYYY').format('DD/MM');
       const prayerData = calendarData.find(item => item.date === formattedDate);
 
       if (prayerData) {
         state.prayerData = {
           date: dateString,
           prayerTimes: [
-            { name: 'Fajr', time: prayerData.fajar_jamat },
-            { name: 'Zuhur', time: prayerData.zuhar_jamat },
-            { name: 'Asar', time: prayerData.asar_jamat },
-            { name: 'Maghrib', time: prayerData.magrib_jamat },
-            { name: 'Isha', time: prayerData.isha_jamat },
+            {name: 'Fajr', time: prayerData.sehri_end},
+            {name: 'Zuhr', time: prayerData.zuhar_begin},
+            {name: 'Asr', time: prayerData.asar_begin},
+            {name: 'Maghrib', time: prayerData.magrib_jamat},
+            {name: 'Isha', time: prayerData.isha_begin},
           ],
         };
         state.error = null;
@@ -39,11 +43,11 @@ const calendarSlice = createSlice({
 
       if (todayPrayers) {
         const prayerSchedule = [
-          { name: 'Fajr', time: todayPrayers.fajar_jamat },
-          { name: 'Zuhur', time: todayPrayers.zuhar_jamat },
-          { name: 'Asar', time: todayPrayers.asar_jamat },
-          { name: 'Maghrib', time: todayPrayers.magrib_jamat },
-          { name: 'Isha', time: todayPrayers.isha_jamat },
+          {name: 'Fajr', time: todayPrayers.sehri_end},
+          {name: 'Zuhr', time: todayPrayers.zuhar_begin},
+          {name: 'Asr', time: todayPrayers.asar_begin},
+          {name: 'Maghrib', time: todayPrayers.magrib_jamat},
+          {name: 'Isha', time: todayPrayers.isha_begin},
         ];
 
         const currentTime = moment();
@@ -62,5 +66,5 @@ const calendarSlice = createSlice({
   },
 });
 
-export const { fetchPrayerDataForDate, getNextPrayerData } = calendarSlice.actions;
+export const { fetchPrayerDataForDate, getNextPrayerData ,getCalendar} = calendarSlice.actions;
 export default calendarSlice.reducer;

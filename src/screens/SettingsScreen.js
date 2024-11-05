@@ -15,6 +15,7 @@ import fonts from '../assets/fonts/MyFonts';
 import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
 import AppHeader from '../components/headers/AppHeader';
 import calendarData from '../calendar.json';
+import { scheduleTwoWeeksOfPrayerAlarms } from '../utils/WeeklyAlarms';
 
 const SettingsScreen = () => {
   const isReminderEnabled = useSelector(state => state.notification.isReminderEnabled);
@@ -106,9 +107,9 @@ const SettingsScreen = () => {
     dispatch(setReminderEnabled(value));
     if (value && todayPrayers) {
       await startBackgroundFetch();
-      await schedulePrayerAlarms(); // Schedule alarms for today's prayers
+      await scheduleTwoWeeksOfPrayerAlarms();
     } else {
-      cancelAllScheduledNotifications(); // Cancel all notifications if toggled off
+      cancelAllScheduledNotifications();
       BackgroundFetch.stop();
     }
   };

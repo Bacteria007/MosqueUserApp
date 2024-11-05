@@ -1,25 +1,25 @@
-import React, {useEffect} from 'react';
-import {Alert} from 'react-native';
-import notifee, {AndroidImportance, TriggerType} from '@notifee/react-native';
-import {Provider} from 'react-redux';
-import {StripeProvider} from '@stripe/stripe-react-native';
-import {NavigationContainer} from '@react-navigation/native';
+import React, { useEffect } from 'react';
+import { Alert, LogBox } from 'react-native';
+import notifee from '@notifee/react-native';
+import { Provider } from 'react-redux';
+import { StripeProvider } from '@stripe/stripe-react-native';
+import { NavigationContainer } from '@react-navigation/native';
 import AppNavigator from './src/navigation/AppNavigator';
 import store from './src/store/store';
-import {STRIPE_PUBLISHABLE_KEY} from '@env';
+import { STRIPE_PUBLISHABLE_KEY } from '@env';
 import Toast from 'react-native-toast-message';
-import {PersistGate} from 'redux-persist/integration/react';
+import { PersistGate } from 'redux-persist/integration/react';
 import persistStore from 'redux-persist/es/persistStore';
 import BackgroundFetch from 'react-native-background-fetch';
-import moment from 'moment';
-import calendarData from './src/calendar.json';
-import {appName} from './src/services/constants';
-import { scheduleDailyPrayerAlarms } from './src/utils/NotificationUtils';
+import { scheduleTwoWeeksOfPrayerAlarms, cancelAllScheduledNotifications } from './src/utils/WeeklyAlarms';
+import calendarData from './src/calendar.json'; 
 
+LogBox.ignoreAllLogs()
 let persistor = persistStore(store);
 
 const App = () => {
   useEffect(() => {
+    // Request notification permissions on app start
     async function requestPermissions() {
       const settings = await notifee.requestPermission();
       if (!settings) {
@@ -30,24 +30,34 @@ const App = () => {
       }
     }
 
-    requestPermissions();
+    // Call function to schedule initial two weeks of alarms
+    async function scheduleInitialAlarms() {
+      await cancelAllScheduledNotifications(); // Clear existing notifications
+      await scheduleTwoWeeksOfPrayerAlarms(); // Schedule new two-week alarms
+    }
 
+    // Initial permission request and alarm scheduling
+    requestPermissions();
+    scheduleInitialAlarms();
+
+    // Configure BackgroundFetch for rescheduling
     BackgroundFetch.configure(
       {
-        minimumFetchInterval: 720,
+        minimumFetchInterval: 720, // Interval in minutes (12 hours)
         forceAlarmManager: true,
         stopOnTerminate: false,
         startOnBoot: true,
         enableHeadless: true,
       },
       async taskId => {
-        await scheduleDailyPrayerAlarms();
+        await cancelAllScheduledNotifications(); // Cancel existing notifications
+        await scheduleTwoWeeksOfPrayerAlarms(); // Reschedule the next two weeks
         BackgroundFetch.finish(taskId);
       },
       error => console.error('[BackgroundFetch] configure error:', error),
     );
 
-    BackgroundFetch.start();
+    BackgroundFetch.start(); // Start BackgroundFetch service
   }, []);
 
   return (

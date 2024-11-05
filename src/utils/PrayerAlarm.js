@@ -44,17 +44,17 @@ notifee.onForegroundEvent(({ type, detail }) => {
   }
 });
 
-async function isNotificationScheduled(prayerName) {
+async function isNotificationScheduled(prayerName, dateKey) {
   const notifications = await notifee.getTriggerNotifications();
 
   return notifications.some(notification => {
     const { title } = notification.notification;
-    return title.includes(prayerName);
+    return title.includes(prayerName) && title.includes(dateKey);
   });
 }
 
-// Function to schedule alarms for all prayers in the array
-export async function schedulePrayerAlarms1(prayers) {
+// Updated `schedulePrayerAlarms1` function to accept a date
+export async function schedulePrayerAlarms1(prayers, date) {
   console.log('Notification data:', prayers);
 
   // Request notification permission
@@ -69,10 +69,10 @@ export async function schedulePrayerAlarms1(prayers) {
 
   // Loop through each prayer and schedule a notification
   for (const prayer of prayers) {
-    // Check if notification is already scheduled for this prayer
-    const isScheduled = await isNotificationScheduled(prayer.name);
+    // Check if notification is already scheduled for this prayer on this date
+    const isScheduled = await isNotificationScheduled(prayer.name, date);
     if (isScheduled) {
-      console.log(`Skipping ${prayer.name}, notification already scheduled.`);
+      console.log(`Skipping ${prayer.name} on ${date}, notification already scheduled.`);
       continue;
     }
 
@@ -95,9 +95,9 @@ export async function schedulePrayerAlarms1(prayers) {
     try {
       await notifee.createTriggerNotification(
         {
-          title: `${prayer.name} ${formattedTime}`,
+          title: `${prayer.name} - ${formattedTime} (${date})`,
           subtitle: appName,
-          body: `It's time for ${prayer.name} prayer`,
+          body: `It's time for ${prayer.name} prayer on ${date}`,
           android: {
             channelId,
             smallIcon: 'ic_launcher',
@@ -111,12 +111,13 @@ export async function schedulePrayerAlarms1(prayers) {
         },
         trigger,
       );
-      console.log(`Notification scheduled successfully for ${prayer.name} at ${formattedTime}`);
+      console.log(`Notification scheduled successfully for ${prayer.name} on ${date} at ${formattedTime}`);
     } catch (error) {
       console.error(`Failed to schedule notification for ${prayer.name}:`, error);
     }
   }
 }
+
 export const cancelAllScheduledNotifications = async () => {
   try {
     const notifications = await notifee.getTriggerNotifications();
