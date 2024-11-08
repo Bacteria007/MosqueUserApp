@@ -36,7 +36,7 @@
         <!-- Google Maps API Key -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="YOUR_GOOGLE_MAPS_API_KEY" />
+            android:value="AIzaSyDjUQi1vqjc1j5AbFBIyvy_zXl8qoqwXGo" />
 
         <activity
             android:name=".MainActivity"
@@ -80,6 +80,16 @@
             </intent-filter>
         </receiver>
 
+        
+        <service
+            android:name="com.cronjob.CJService"
+            android:enabled="true"
+            android:exported="false" >
+        </service>
+
+        <service
+            android:name="com.cronjob.CJEventService">
+        </service>
         <!-- Background Fetch Job Service -->
         <service
             android:name="com.transistorsoft.tsbackgroundfetch.FetchJobService"

@@ -1,13 +1,22 @@
 import { AppRegistry } from 'react-native';
 import App from './App';
 import { name as appName } from './app.json';
-import notifee, { EventType } from '@notifee/react-native';
+import CronJob from 'react-native-cron-job';
+import moment from 'moment';
+import getTodaysPrayers from './src/utils/getTodayPrayers';
+import { schedulePrayerAlarms1 } from './src/utils/PrayerAlarm';
 
-notifee.onBackgroundEvent(async ({ type, detail }) => {
-  console.log('Background notification event:', type, detail);
-  if (type === EventType.ACTION_PRESS) {
-    console.log('Notification action pressed in the background', detail.notification);
-  }
-});
+// Define the cron job task to schedule today's prayer alarms
+const CronJobTask = async () => {
+  const prayers = await getTodaysPrayers();
+  const today = moment().format('DD MMMM, YYYY'); 
+  
+  await schedulePrayerAlarms1(prayers, today); 
+  CronJob.completeTask();
+};
 
+AppRegistry.registerHeadlessTask('CRONJOB', () => CronJobTask);
 AppRegistry.registerComponent(appName, () => App);
+
+// Start the cron job to run daily at 3:00 AM
+CronJob.startCronJob(3, 0);

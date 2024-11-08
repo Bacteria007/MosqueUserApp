@@ -34,7 +34,7 @@ const MosqueLocationScreen = () => {
 
   useFocusEffect(
     React.useCallback(() => {
-      checkAndRequestLocationPermission(); // Re-check location permission on focus
+      checkAndRequestLocationPermission();
     }, []),
   );
 
@@ -92,6 +92,7 @@ const MosqueLocationScreen = () => {
         fetchRoute(location, mosqueLocation);
         centerMap(location);
       },
+      
       error => {
         console.log('Location error:', error);
         showEnableLocationAlert(); // Prompt to enable location if error

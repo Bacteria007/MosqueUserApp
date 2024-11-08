@@ -2,7 +2,6 @@ import notifee, { EventType, TriggerType, TimestampTrigger } from '@notifee/reac
 import { PermissionsAndroid, Platform } from 'react-native';
 import moment from 'moment'; // For time formatting and calculations
 import { appName } from '../services/constants';
-import transformFuturePrayers from './TransformPrayerData';
 
 // Ensure notification permission for Android 13+
 async function requestNotificationPermission() {
@@ -53,7 +52,7 @@ async function isNotificationScheduled(prayerName, dateKey) {
   });
 }
 
-// Updated `schedulePrayerAlarms1` function to accept a date
+
 export async function schedulePrayerAlarms1(prayers, date) {
   console.log('Notification data:', prayers);
 

@@ -6,7 +6,6 @@ import BackgroundTimer from 'react-native-background-timer';
 import BackgroundFetch from 'react-native-background-fetch';
 import moment from 'moment';
 import { useNavigation } from '@react-navigation/native';
-import { cancelAllScheduledNotifications, schedulePrayerAlarms } from '../utils/NotificationUtils';
 import { setAutoSilentEnabled, setReminderEnabled } from '../reducers/notificationSlice';
 import CommonStyles from '../assets/styles/CommonStyles';
 import colors from '../assets/colors/AppColors';
@@ -15,7 +14,8 @@ import fonts from '../assets/fonts/MyFonts';
 import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
 import AppHeader from '../components/headers/AppHeader';
 import calendarData from '../calendar.json';
-import { scheduleTwoWeeksOfPrayerAlarms } from '../utils/WeeklyAlarms';
+import { cancelAllScheduledNotifications, schedulePrayerAlarms1 } from '../utils/PrayerAlarm';
+import getTodaysPrayers from '../utils/getTodayPrayers';
 
 const SettingsScreen = () => {
   const isReminderEnabled = useSelector(state => state.notification.isReminderEnabled);
@@ -106,33 +106,16 @@ const SettingsScreen = () => {
   const handleReminderSwitch = async value => {
     dispatch(setReminderEnabled(value));
     if (value && todayPrayers) {
-      await startBackgroundFetch();
-      await scheduleTwoWeeksOfPrayerAlarms();
+      const prayers = await getTodaysPrayers(); 
+      const today = moment().format('DD MMMM, YYYY');      
+      await schedulePrayerAlarms1(prayers, today);
     } else {
       cancelAllScheduledNotifications();
       BackgroundFetch.stop();
     }
   };
 
-  const startBackgroundFetch = () => {
-    BackgroundFetch.configure(
-      {
-        minimumFetchInterval: 720,
-        forceAlarmManager: true,
-        stopOnTerminate: false,
-        startOnBoot: true,
-        enableHeadless: true,
-      },
-      async taskId => {
-        await schedulePrayerAlarms();
-        BackgroundFetch.finish(taskId);
-      },
-      error => console.error('[BackgroundFetch] configure error:', error),
-    );
-
-    BackgroundFetch.start();
-  };
-
+  
   return (
     <View style={CommonStyles.container}>
       <TransparentStatusbar />
