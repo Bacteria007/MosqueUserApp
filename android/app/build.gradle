@@ -68,6 +68,7 @@ dependencies {
     }
 
     implementation('com.transistorsoft:tsbackgroundfetch')
+    implementation project(':react-native-background-timer')
 }
 
 apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")

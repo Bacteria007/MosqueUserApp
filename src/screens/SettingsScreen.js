@@ -14,7 +14,7 @@ import fonts from '../assets/fonts/MyFonts';
 import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
 import AppHeader from '../components/headers/AppHeader';
 import calendarData from '../calendar.json';
-import { cancelAllScheduledNotifications, schedulePrayerAlarms1 } from '../utils/PrayerAlarm';
+import { cancelAllScheduledNotifications, schedulePrayerAlarms } from '../utils/PrayerAlarm';
 import getTodaysPrayers from '../utils/getTodayPrayers';
 
 const SettingsScreen = () => {
@@ -107,8 +107,7 @@ const SettingsScreen = () => {
     dispatch(setReminderEnabled(value));
     if (value && todayPrayers) {
       const prayers = await getTodaysPrayers(); 
-      const today = moment().format('DD MMMM, YYYY');      
-      await schedulePrayerAlarms1(prayers, today);
+      await schedulePrayerAlarms(prayers)
     } else {
       cancelAllScheduledNotifications();
       BackgroundFetch.stop();

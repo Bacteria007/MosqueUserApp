@@ -16,6 +16,7 @@ end
 
 target 'MosqueApp' do
   config = use_native_modules!
+  pod 'react-native-background-timer', :path => '../node_modules/react-native-background-timer'
 
   use_react_native!(
     :path => config[:reactNativePath],

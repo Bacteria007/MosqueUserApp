@@ -10,15 +10,21 @@ import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.load
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.soloader.SoLoader
+import com.ocetnik.timer.BackgroundTimerPackage
 
 class MainApplication : Application(), ReactApplication {
 
   override val reactNativeHost: ReactNativeHost =
       object : DefaultReactNativeHost(this) {
-        override fun getPackages(): List<ReactPackage> =
-            PackageList(this).packages.apply {
-              // Add manually linked packages here if needed.
-            }
+        override fun getPackages(): List<ReactPackage> {
+            // Get the default list of packages
+            val packages = PackageList(this).packages.toMutableList()
+            
+            // Add BackgroundTimerPackage manually
+      //  packages.add(BackgroundTimerPackage())
+
+            return packages
+        }
 
         override fun getJSMainModuleName(): String = "index"
 

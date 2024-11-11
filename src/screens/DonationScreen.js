@@ -77,9 +77,11 @@ const DonationScreen = () => {
     <View style={[CommonStyles.container]}>
       <TransparentStatusbar />
       <AppHeader />
-
       <MainScreensHeader title={'Donate'} />
+<View style={{flex:1,justifyContent:'center'}}>
+
       <Text style={styles.undertext}>This feature is under development</Text>
+</View>
       {/* {step == 1 && (
         <ScrollView contentContainerStyle={{flexGrow: 1}}>
           <View
