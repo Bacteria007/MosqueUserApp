@@ -4,7 +4,6 @@ import { name as appName } from './app.json';
 import CronJob from 'react-native-cron-job';
 import moment from 'moment';
 import getTodaysPrayers from './src/utils/getTodayPrayers';
-import { schedulePrayerAlarms1 } from './src/utils/PrayerAlarm';
 
 // // Define the cron job task to schedule today's prayer alarms
 // const CronJobTask = async () => {

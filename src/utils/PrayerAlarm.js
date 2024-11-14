@@ -1,7 +1,6 @@
 import notifee, {
   EventType,
   TriggerType,
-  TimestampTrigger,
   AndroidVisibility,
   AndroidImportance,
 } from '@notifee/react-native';
@@ -28,7 +27,7 @@ const formatTo12Hour = time => {
   return moment(time, 'HH:mm:ss').format('h:mm A'); // Convert to 12-hour format
 };
 
-const calculateTriggerTimestamp = (prayerTime) => {
+const calculateTriggerTimestamp = prayerTime => {
   const currentTime = moment();
   const targetTime = moment(prayerTime, 'HH:mm:ss');
 
@@ -37,10 +36,9 @@ const calculateTriggerTimestamp = (prayerTime) => {
     return null;
   }
 
-  console.log("Trigger timestamp: ", targetTime.valueOf()); // Debug line
+  console.log('Trigger timestamp: ', targetTime.valueOf()); // Debug line
   return targetTime.valueOf(); // Returns the timestamp in milliseconds
 };
-
 
 // Handle notification events when the user interacts with the notification
 notifee.onForegroundEvent(({type, detail}) => {
@@ -52,12 +50,12 @@ notifee.onForegroundEvent(({type, detail}) => {
 
 async function isNotificationScheduled(prayerName) {
   const notifications = await notifee.getTriggerNotifications();
-  
-  const exists = notifications.some((notification) => {
+
+  const exists = notifications.some(notification => {
     return notification.notification?.title.includes(prayerName);
   });
 
-  console.log(`Is ${prayerName} notification already scheduled?`, exists); // Debug line
+  console.log(`Is ${prayerName} notification already scheduled?, exists`); // Debug line
   return exists;
 }
 
@@ -74,9 +72,9 @@ export async function schedulePrayerAlarms(prayers) {
     name: 'Prayer Reminder',
     sound: 'azan',
     importance: AndroidImportance.HIGH,
-    });
+  });
 
-  for (const prayer of prayers) {    
+  for (const prayer of prayers) {
     const isScheduled = await isNotificationScheduled(prayer.name);
     if (isScheduled) {
       console.log(`Skipping ${prayer.name}, notification already scheduled.`);
@@ -98,9 +96,9 @@ export async function schedulePrayerAlarms(prayers) {
     try {
       await notifee.createTriggerNotification(
         {
-          title: `${prayer.name} - ${formattedTime}`,
+          title: `${prayer.name}`,
           subtitle: appName,
-          body: `It's time for ${prayer.name} prayer`,
+          body: `${prayer.name} prayer at - ${formattedTime}`,
           android: {
             channelId,
             smallIcon: 'ic_launcher',
@@ -119,9 +117,14 @@ export async function schedulePrayerAlarms(prayers) {
         },
         trigger,
       );
-      console.log(`Notification scheduled successfully for ${prayer.name} at ${formattedTime}`);
+      console.log(
+        `Notification scheduled successfully for ${prayer.name} at ${formattedTime}`,
+      );
     } catch (error) {
-      console.error(`Failed to schedule notification for ${prayer.name}:`, error);
+      console.error(
+        `Failed to schedule notification for ${prayer.name}:`,
+        error,
+      );
     }
   }
 }
@@ -227,5 +230,3 @@ export const cancelAllScheduledNotifications = async () => {
 //     }
 //   }
 // }
-
-

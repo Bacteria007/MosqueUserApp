@@ -103,11 +103,12 @@ const SettingsScreen = () => {
     if (value) scheduleSilentModeForNextPrayer();
   };
 
-  const handleReminderSwitch = async value => {
+  const handleReminderSwitch =  value => {
     dispatch(setReminderEnabled(value));
+    
     if (value && todayPrayers) {
-      const prayers = await getTodaysPrayers(); 
-      await schedulePrayerAlarms(prayers)
+      const prayers =  getTodaysPrayers(); 
+       schedulePrayerAlarms(prayers)
     } else {
       cancelAllScheduledNotifications();
       BackgroundFetch.stop();

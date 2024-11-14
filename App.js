@@ -9,7 +9,8 @@ import {STRIPE_PUBLISHABLE_KEY} from '@env';
 import Toast from 'react-native-toast-message';
 import {PersistGate} from 'redux-persist/integration/react';
 import BackgroundFetch from 'react-native-background-fetch';
-import { schedulePrayerAlarms1 } from './src/utils/PrayerAlarm';
+import {schedulePrayerAlarms} from './src/utils/PrayerAlarm';
+import getTodaysPrayers from './src/utils/getTodayPrayers';
 
 LogBox.ignoreAllLogs();
 
@@ -45,10 +46,27 @@ const App = () => {
     };
   }, []);
 
-  const performScheduledTask = async () => {
-    const prayers = await getTodaysPrayers();
-    const today = moment().format('DD MMMM, YYYY');
-    await schedulePrayerAlarms1(prayers, today);
+  const performScheduledTask = () => {
+    try {
+      console.log(
+        '[performScheduledTask] Fetching today’s prayers...',
+        new Date().toLocaleTimeString(),
+      );
+      const prayers = getTodaysPrayers();
+      if (prayers) {
+        schedulePrayerAlarms(prayers);
+        console.log(
+          '[performScheduledTask] Prayer alarms scheduled successfully',
+        );
+      } else {
+        console.warn('[performScheduledTask] No prayer times available');
+      }
+    } catch (error) {
+      console.error(
+        '[performScheduledTask] Error scheduling prayer alarms:',
+        error,
+      );
+    }
   };
 
   return (

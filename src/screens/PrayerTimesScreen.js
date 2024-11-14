@@ -24,17 +24,15 @@ import momenthijri from 'moment-hijri';
 import {useFocusEffect} from '@react-navigation/native';
 import {checkAndRequestLocationPermission} from '../utils/LocationPermission';
 import {getCalendar} from '../reducers/calendarSlice';
-import { schedulePrayerAlarms } from '../utils/PrayerAlarm';
-
+import {schedulePrayerAlarms} from '../utils/PrayerAlarm';
 
 const {height} = Dimensions.get('window');
 const headerCardHeight = height < 630 ? height * 0.2 : height * 0.25;
 
 const PrayerTimesScreen = () => {
-
   const [upcomingPrayer, setUpcomingPrayer] = useState({});
   const [todayPrayers, setTodayPrayers] = useState({});
-  const [nextPrayer, setNextPrayer] = useState({})
+  const [nextPrayer, setNextPrayer] = useState({});
   const [date, setDate] = useState(new Date());
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [islamicDate, setIslamicDate] = useState('');
@@ -44,13 +42,13 @@ const PrayerTimesScreen = () => {
   );
   const [jumaTimings, setJumaTimings] = useState({khutbah: null, salah: null});
   const calendarData = useSelector(state => state.calendar.calendar);
-  const isReminderEnabled = useSelector(state => state.notification.isReminderEnabled);
-  // console.log('Loaded calendar data:', calendarData);
+  const isReminderEnabled = useSelector(
+    state => state.notification.isReminderEnabled,
+  );
   useEffect(() => {
-    // Fetch calendar data when component mounts
     dispatch(getCalendar());
   }, [dispatch]);
-  
+
   useEffect(() => {
     // if (moment().format('dddd') === 'Friday') {
     const zuhrJamatTime = todayPrayers?.zuhar_jamat;
@@ -66,7 +64,6 @@ const PrayerTimesScreen = () => {
 
   useEffect(() => {
     if (isReminderEnabled && todayPrayers) {
-      // Prepare array of prayer objects
       const prayersArray = [
         {name: 'Fajr', time: todayPrayers?.sehri_end},
         {name: 'Zuhr', time: todayPrayers?.zuhar_begin},
@@ -76,7 +73,7 @@ const PrayerTimesScreen = () => {
       ].filter(prayer => prayer.time);
       schedulePrayerAlarms(prayersArray);
     }
-  }, [todayPrayers,isReminderEnabled]);
+  }, [todayPrayers, isReminderEnabled]);
 
   // ============ Location start
   useFocusEffect(
@@ -87,24 +84,21 @@ const PrayerTimesScreen = () => {
   // ============ Location End
   useEffect(() => {
     momenthijri.locale('en');
-    const hijriDate = momenthijri().format('iD iMMMM iYYYY'); // Hijri format
-    setIslamicDate(hijriDate); // Convert and set date
+    const hijriDate = momenthijri().format('iD iMMMM iYYYY'); 
+    setIslamicDate(hijriDate); 
   }, []);
 
   useEffect(() => {
-    // Only load prayers for today if calendar data has been loaded
     if (calendarData && calendarData.length > 0) {
       loadPrayersForDate(selectedDate);
     }
   }, [calendarData, selectedDate]);
-  
 
-// Watch for selected date change, ensuring todayPrayers updates for today
-useEffect(() => {
-  if (selectedDate === moment().format('DD MMMM, YYYY')) {
-    calculateUpcomingAndNextPrayers();
-  }
-}, [todayPrayers, selectedDate]);
+  useEffect(() => {
+    if (selectedDate === moment().format('DD MMMM, YYYY')) {
+      calculateUpcomingAndNextPrayers();
+    }
+  }, [todayPrayers, selectedDate]);
 
   const loadPrayersForDate = dateString => {
     const formattedDate = moment(dateString, 'DD MMMM').format('DD/MM');
@@ -116,64 +110,26 @@ useEffect(() => {
     );
     setIslamicDate(hijriDate);
   };
-
-  // both next and upcoming change after isha
-  // const calculateUpcomingAndNextPrayers = () => {
-  //   if (!todayPrayers || Object.keys(todayPrayers).length === 0) {
-  //     setUpcomingPrayer(null);
-  //     setNextPrayer(null);
-  //     return;
-  //   }
-  
-  //   const prayerSchedule = [
-  //     {name: 'Fajr', time: todayPrayers.sehri_end},
-  //     {name: 'Zuhr', time: todayPrayers.zuhar_begin},
-  //     {name: 'Asr', time: todayPrayers.asar_begin},
-  //     {name: 'Maghrib', time: todayPrayers.magrib_jamat},
-  //     {name: 'Isha', time: todayPrayers.isha_begin},
-  //   ];
-  
-  //   const currentTime = moment();
-  //   let upcomingFound = false;
-  
-  //   // Iterate through each prayer to find the next upcoming prayer
-  //   for (const prayer of prayerSchedule) {
-  //     const prayerTime = moment(prayer.time, 'HH:mm');
-  //     if (prayerTime.isAfter(currentTime)) {
-  //       setUpcomingPrayer(prayer);
-  //       upcomingFound = true;
-  //       break;
-  //     }
-  //   }
-  
-  //   // If no upcoming prayer was found for today, load the next day's prayers
-  //   if (!upcomingFound) {
-  //     const nextDate = moment(selectedDate, 'DD MMMM, YYYY').add(1, 'day');
-  //     const nextDateString = nextDate.format('DD MMMM, YYYY');
-  //     loadPrayersForDate(nextDateString);
-  //     setSelectedDate(nextDateString);
-  //   }
-  // };
-  
-  // only next prayer change after isha
+ 
   const calculateUpcomingAndNextPrayers = () => {
     if (!todayPrayers || Object.keys(todayPrayers).length === 0) {
       setUpcomingPrayer(null);
       setNextPrayer(null);
       return;
     }
-  
+
     const prayerSchedule = [
-      { name: 'Fajr', time: todayPrayers.sehri_end },
-      { name: 'Zuhr', time: todayPrayers.zuhar_begin },
-      { name: 'Asr', time: todayPrayers.asar_begin },
-      { name: 'Maghrib', time: todayPrayers.magrib_jamat },
-      { name: 'Isha', time: todayPrayers.isha_begin },
+      {name: 'Fajr', time: todayPrayers.sehri_end},
+      {name: 'Zuhr', time: todayPrayers.zuhar_begin},
+      {name: 'Asr', time: todayPrayers.asar_begin},
+      {name: 'Maghrib', time: todayPrayers.magrib_jamat},
+      {name: 'Isha', time: todayPrayers.isha_begin},
     ];
-  
+
+    // const currentTime = moment('21:00', 'HH:mm');
     const currentTime = moment();
     let foundUpcomingPrayer = false;
-  
+
     // Find the first upcoming prayer for today
     for (const prayer of prayerSchedule) {
       const prayerTime = moment(prayer.time, 'HH:mm');
@@ -183,32 +139,29 @@ useEffect(() => {
         break;
       }
     }
-  
-    // If no upcoming prayer was found for today, set the next day's first prayer as `nextPrayer`
+
     if (!foundUpcomingPrayer) {
       setUpcomingPrayer(null);
-  
+
       const nextDate = moment(selectedDate, 'DD MMMM, YYYY').add(1, 'day');
-      const nextDateString = nextDate.format('DD MMMM, YYYY');
-      
-      // Load prayers for the next day to get the first prayer of that day
-      const nextDayPrayers = calendarData?.find(item => item.date === nextDate.format('DD/MM'));
-  
+      const nextDayPrayers = calendarData?.find(
+        item => item.date === nextDate.format('DD/MM'),
+      );
+
       if (nextDayPrayers) {
         const nextDayPrayerSchedule = [
-          { name: 'Fajr', time: nextDayPrayers.sehri_end },
-          { name: 'Zuhr', time: nextDayPrayers.zuhar_begin },
-          { name: 'Asr', time: nextDayPrayers.asar_begin },
-          { name: 'Maghrib', time: nextDayPrayers.magrib_jamat },
-          { name: 'Isha', time: nextDayPrayers.isha_begin },
+          {name: 'Fajr', time: nextDayPrayers.sehri_end},
+          {name: 'Zuhr', time: nextDayPrayers.zuhar_begin},
+          {name: 'Asr', time: nextDayPrayers.asar_begin},
+          {name: 'Maghrib', time: nextDayPrayers.magrib_jamat},
+          {name: 'Isha', time: nextDayPrayers.isha_begin},
         ];
-        
-        // Set the first prayer of the next day as the `nextPrayer`
+
         setNextPrayer(nextDayPrayerSchedule[0]);
       }
     }
   };
-  
+
   const handleDateChange = newDate => {
     const newDateString = moment(newDate).format('DD MMMM, YYYY');
     setSelectedDate(newDateString);
@@ -271,14 +224,12 @@ useEffect(() => {
     const today = moment().format('DD MMMM, YYYY');
     const isNextPrayer =
       selectedDate == today && upcomingPrayer?.name == prayerName;
-    // console.log(upcomingPrayer?.name, prayerName);
-    // console.log(upcomingPrayer);
-
+  
     return (
       <View
         style={[
           styles.prayerItem,
-          isNextPrayer && {backgroundColor: colors.primary}, //#f3c306
+          isNextPrayer && {backgroundColor: colors.primary},
         ]}>
         <Text
           style={[
@@ -347,7 +298,7 @@ useEffect(() => {
               <View style={{justifyContent: 'center', alignItems: 'center'}}>
                 <View style={{alignItems: 'center', width: '100%'}}>
                   <Text style={styles.prayerItemTitle}>
-                    {upcomingPrayer?.name || ''}
+                    {upcomingPrayer?.name || nextPrayer?.name || ''}
                   </Text>
                   <Text
                     style={{
@@ -355,7 +306,9 @@ useEffect(() => {
                       fontSize: height > 630 ? 36 : 30,
                       fontFamily: fonts.semibold,
                     }}>
-                    {formatTimeTo12Hour(upcomingPrayer?.time || '')}
+                    {formatTimeTo12Hour(
+                      upcomingPrayer?.time || nextPrayer?.time || '',
+                    )}
                   </Text>
                   <Text
                     style={{

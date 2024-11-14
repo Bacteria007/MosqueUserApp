@@ -22,9 +22,10 @@ import AppHeader from '../components/headers/AppHeader';
 import {GOOGLE_MAPS_APIKEY} from '../services/constants';
 import {useFocusEffect} from '@react-navigation/native';
 
+// 53.8391471,-2.2985629
 const mosqueLocation = {
-  latitude: 32.112,
-  longitude: 74.1923,
+  latitude: 53.6375,
+  longitude:-1.7917,
 };
 
 const MosqueLocationScreen = () => {
