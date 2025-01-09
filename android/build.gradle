@@ -12,6 +12,7 @@ buildscript {
         google()
         mavenCentral()
         maven { url "$rootDir/../node_modules/react-native-background-fetch/android/libs" }
+        
     }
 
     dependencies {

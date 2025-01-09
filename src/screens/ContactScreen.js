@@ -7,7 +7,7 @@ import {
   Linking,
   TouchableOpacity,
 } from 'react-native';
-import { Icons } from '../assets/icons/Icons'; // Assuming your icons are imported here
+import {Icons} from '../assets/icons/Icons'; // Assuming your icons are imported here
 import colors from '../assets/colors/AppColors';
 import fonts from '../assets/fonts/MyFonts';
 import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
@@ -26,17 +26,25 @@ const ContactScreen = () => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <MainScreensHeader
           title="Contact Us"
-          style={{ margin: 0, padding: 0, marginBottom: 20 }}
+          style={{margin: 0, padding: 0, marginBottom: 20}}
         />
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Markazi Jamia Ghausia Masjid</Text>
           <View style={styles.iconTextRow}>
-            <Icons.FontAwesome name="building" size={18} color={colors.primary} />
+            <Icons.FontAwesome
+              name="building"
+              size={18}
+              color={colors.primary}
+            />
             <Text style={styles.contactText}>Clayton Street</Text>
           </View>
           <View style={styles.iconTextRow}>
-            <Icons.MaterialIcons name="location-pin" size={18} color={colors.primary} />
+            <Icons.MaterialIcons
+              name="location-pin"
+              size={18}
+              color={colors.primary}
+            />
             <Text style={styles.contactText}>Nelson, Lancashire BB9 7PR</Text>
           </View>
           <View style={styles.iconTextRow}>
@@ -48,12 +56,21 @@ const ContactScreen = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Ghausia Madrassa</Text>
           <View style={styles.iconTextRow}>
-            <Icons.FontAwesome5 name="school" size={18} color={colors.primary} />
-            <Text style={styles.contactText}>Barkerhouse Road</Text>
+            <Icons.FontAwesome5
+              name="school"
+              size={18}
+              color={colors.primary}
+            />
+            <Text style={styles.contactText}>Barkerhouse Road,</Text>
           </View>
           <View style={styles.iconTextRow}>
-            <Icons.MaterialIcons name="location-pin" size={18} color={colors.primary} />
-            <Text style={styles.contactText}>Nelson, Lancashire BB9 9ES</Text>
+            <Icons.MaterialIcons
+              name="location-pin"
+              size={18}
+              color={colors.primary}
+            />
+            <Text style={styles.contactText}>Nelson, Lancashire</Text>
+            <Text style={styles.contactText}>BB9 9ES</Text>
           </View>
           <View style={styles.iconTextRow}>
             <Icons.FontAwesome name="phone" size={18} color={colors.primary} />
@@ -62,21 +79,42 @@ const ContactScreen = () => {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Silverman Hall Community Centre</Text>
+          <Text style={styles.sectionTitle}>
+            Silverman Hall Community Centre
+          </Text>
           <View style={styles.iconTextRow}>
-            <Icons.FontAwesome name="building-o" size={18} color={colors.primary} />
+            <Icons.FontAwesome
+              name="building-o"
+              size={18}
+              color={colors.primary}
+            />
             <Text style={styles.contactText}>Pendle Street</Text>
           </View>
           <View style={styles.iconTextRow}>
-            <Icons.MaterialIcons name="location-pin" size={18} color={colors.primary} />
-            <Text style={styles.contactText}>Nelson, Lancashire BB9 7NH</Text>
+            <Icons.MaterialIcons
+              name="location-pin"
+              size={18}
+              color={colors.primary}
+            />
+            <Text style={styles.contactText}>Nelson, Lancashire</Text>
+            <Text style={styles.contactText}>BB9 7NH</Text>
           </View>
         </View>
-
-        <TouchableOpacity onPress={openEmail} style={styles.emailRow}>
-          <Icons.FontAwesome name="envelope" size={18} color={colors.primary} />
-          <Text style={styles.emailLink}>info@nelsonghausiatrust.co.uk</Text>
-        </TouchableOpacity>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            To enquire about booking Silverman Hall Community Centre please
+            email us at
+          </Text>
+          <TouchableOpacity onPress={openEmail} style={styles.emailRow}>
+            <Icons.FontAwesome
+              name="envelope"
+              size={18}
+              color={colors.primary}
+            />
+            {/* <Text style={styles.text}></Text> */}
+            <Text style={styles.emailLink}>ghausiamasjidnelson@gmail.com</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </View>
   );
@@ -97,6 +135,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: colors.lighr_grey,
+  },
+  text: {
+    fontSize: 16,
+    fontFamily: fonts.semibold,
+    color: colors.primary,
+    marginBottom: 10,
   },
   sectionTitle: {
     fontSize: 18,

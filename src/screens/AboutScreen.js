@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import {View, Text, ScrollView, StyleSheet} from 'react-native';
 import CommonStyles from '../assets/styles/CommonStyles';
 import colors from '../assets/colors/AppColors';
 import fonts from '../assets/fonts/MyFonts';
@@ -16,22 +16,14 @@ const AboutScreen = () => {
         {/* <MainScreensHeader title="About Us" /> */}
         <Text style={styles.heading}>At a Glance</Text>
         <Text style={styles.paragraph}>
-          Markazi Jamia Ghausia Masjid, part of the Nelson Ghausia Trust, has a
-          rich history spanning more than half a century. It is Nelson’s oldest
-          Mosque, serving communities in the heart of Nelson and beyond{' '}
-          <Text style={styles.highlight}>since 1964</Text>. The trust also
-          operates the Ghausia Madrassa and Silverman Hall Community Centre.
-        </Text>
-
-        <Text style={styles.heading}>Our Mission</Text>
-        <Text style={styles.paragraph}>
-          We aim to provide a space for spiritual growth and foster unity within
-          the community through various programs, education, and social events.
-        </Text>
-
-        <Text style={styles.paragraph}>
-          Our mosque continues to inspire generations, helping them stay connected
-          to their faith while contributing positively to society.
+          At a glance Markazi Jamia Ghausia Masjid has a rich history spanning
+          more than half a century. It is Nelson’s oldest Mosque, serving
+          communities in the heart of the Nelson and beyond{' '}
+          <Text style={styles.highlight}>since 1964</Text>The masjid aims to
+          provide a welcoming space for spiritual growth, congregate for daily
+          prayers and foster a sense of love and unity. This app will provide
+          you with information on some of the services we offer as well as daily
+          prayer reminders. We would welcome your feedback.
         </Text>
       </ScrollView>
     </View>

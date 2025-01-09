@@ -121,7 +121,9 @@ const MainNavigator = () => (
       headerShown: false,
       drawerStyle: {
         width: '65%',
-        backgroundColor: colors.primary
+        backgroundColor: colors.primary,
+        borderTopEndRadius: 15,
+        borderBottomEndRadius: 15,
         // backgroundColor: '#D4EBCC',
       },
       drawerActiveBackgroundColor: 'rgba(255,255,255,0.4)',
@@ -130,6 +132,9 @@ const MainNavigator = () => (
         fontSize: 12,
         color: colors.white,
         marginLeft: -15,
+      },
+      drawerItemStyle: {
+        borderRadius: 99,
       },
     }}>
     <Drawer.Screen

@@ -5,7 +5,8 @@ import fonts from '../../assets/fonts/MyFonts';
 import MyImages from '../../assets/images/MyImages';
 
 const { height } = Dimensions.get('window')
-const headerCardHeight = height < 630 ? height * 0.2 : height * 0.25;
+// const headerCardHeight = height < 630 ? height * 0.2 : height * 0.25;
+const headerCardHeight = 130;
 
 const MainScreensHeader = ({ title, subTitle = '',style }) => {
     return (

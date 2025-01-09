@@ -21,8 +21,8 @@ android {
         applicationId "com.cmykresearch.mosqueuserapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 6
+        versionName "1.4"
     }
 
     signingConfigs {
@@ -33,14 +33,12 @@ android {
             keyPassword 'android'
         }
         //----
-         release {
-            if (project.hasProperty('MYAPP_UPLOAD_STORE_FILE')) {
-                storeFile file(MYAPP_UPLOAD_STORE_FILE)
-                storePassword MYAPP_UPLOAD_STORE_PASSWORD
-                keyAlias MYAPP_UPLOAD_KEY_ALIAS
-                keyPassword MYAPP_UPLOAD_KEY_PASSWORD
-            }
-        }
+        release {
+        keyAlias 'key0'
+        keyPassword 'mosquejks123'
+        storeFile file('./keystore.jks')
+        storePassword 'mosquejks123'
+    }
       
     }
 
@@ -49,11 +47,9 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-             minifyEnabled enableProguardInReleaseBuilds
+            minifyEnabled enableProguardInReleaseBuilds
             shrinkResources enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), 
-                          "proguard-rules.pro"
-            //----
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             signingConfig signingConfigs.release
         }
         

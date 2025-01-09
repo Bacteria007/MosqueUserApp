@@ -1,12 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Switch, StyleSheet, Alert } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
-import { VolumeManager, RINGER_MODE, setRingerMode } from 'react-native-volume-manager';
+import React, {useEffect, useState} from 'react';
+import {View, Text, Switch, StyleSheet, Alert} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
+import {
+  VolumeManager,
+  RINGER_MODE,
+  setRingerMode,
+} from 'react-native-volume-manager';
 import BackgroundTimer from 'react-native-background-timer';
 import BackgroundFetch from 'react-native-background-fetch';
 import moment from 'moment';
-import { useNavigation } from '@react-navigation/native';
-import { setAutoSilentEnabled, setReminderEnabled } from '../reducers/notificationSlice';
+import {useNavigation} from '@react-navigation/native';
+import {
+  setAutoSilentEnabled,
+  setReminderEnabled,
+} from '../reducers/notificationSlice';
 import CommonStyles from '../assets/styles/CommonStyles';
 import colors from '../assets/colors/AppColors';
 import MainScreensHeader from '../components/headers/MainScreensHeader';
@@ -14,12 +21,19 @@ import fonts from '../assets/fonts/MyFonts';
 import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
 import AppHeader from '../components/headers/AppHeader';
 import calendarData from '../calendar.json';
-import { cancelAllScheduledNotifications, schedulePrayerAlarms } from '../utils/PrayerAlarm';
+import {
+  cancelAllScheduledNotifications,
+  schedulePrayerAlarms,
+} from '../utils/PrayerAlarm';
 import getTodaysPrayers from '../utils/getTodayPrayers';
 
 const SettingsScreen = () => {
-  const isReminderEnabled = useSelector(state => state.notification.isReminderEnabled);
-  const isAutoSilentEnabled = useSelector(state => state.notification.isAutoSilentEnabled);
+  const isReminderEnabled = useSelector(
+    state => state.notification.isReminderEnabled,
+  );
+  const isAutoSilentEnabled = useSelector(
+    state => state.notification.isAutoSilentEnabled,
+  );
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [todayPrayers, setTodayPrayers] = useState([]);
@@ -31,17 +45,37 @@ const SettingsScreen = () => {
   }, []);
 
   const loadTodayPrayers = () => {
-    const todayDate = moment().format('D/M');
+    const todayDate = moment().format('DD/MM');
     const todayPrayerData = calendarData.find(item => item.date === todayDate);
 
     if (todayPrayerData) {
       const prayers = [
-        { name: 'Fajr', time: todayPrayerData.sehri_end },
-        { name: 'Zuhr', time: todayPrayerData.zuhar_begin },
-        { name: 'Asr', time: todayPrayerData.asar_begin },
-        { name: 'Maghrib', time: todayPrayerData.magrib_jamat },
-        { name: 'Isha', time: todayPrayerData.isha_begin },
-      ];
+        {
+          name: 'Fajr',
+          time: todayPrayerData?.sehri_end,
+          jamatTime: todayPrayerData.fajar_jamat,
+        },
+        {
+          name: 'Zuhr',
+          time: todayPrayerData?.zuhar_begin,
+          jamatTime: todayPrayerData.zuhar_jamat,
+        },
+        {
+          name: 'Asr',
+          time: todayPrayerData?.asar_begin,
+          jamatTime: todayPrayerData.asar_jamat,
+        },
+        {
+          name: 'Maghrib',
+          time: todayPrayerData?.magrib_jamat,
+          jamatTime: todayPrayerData.magrib_jamat,
+        },
+        {
+          name: 'Isha',
+          time: todayPrayerData?.isha_begin,
+          jamatTime: todayPrayerData.isha_jamat,
+        },
+      ].filter(prayer => prayer.time);
       setTodayPrayers(prayers);
     } else {
       console.error('No prayer data found for today');
@@ -50,7 +84,9 @@ const SettingsScreen = () => {
 
   const calculateNextPrayer = () => {
     const currentTime = moment();
-    const next = todayPrayers.find(prayer => moment(prayer.time, 'HH:mm').isAfter(currentTime));
+    const next = todayPrayers?.find(prayer =>
+      moment(prayer.time, 'HH:mm').isAfter(currentTime),
+    );
     setNextPrayer(next || todayPrayers[0]);
   };
 
@@ -59,7 +95,10 @@ const SettingsScreen = () => {
     const prayerTime = moment(nextPrayer.time, 'HH:mm');
     if (prayerTime.isAfter(moment())) {
       const timeUntilPrayer = prayerTime.diff(moment());
-      BackgroundTimer.setTimeout(() => enableSilentMode(nextPrayer), timeUntilPrayer);
+      BackgroundTimer.setTimeout(
+        () => enableSilentMode(nextPrayer),
+        timeUntilPrayer,
+      );
     }
   };
 
@@ -83,7 +122,7 @@ const SettingsScreen = () => {
         Alert.alert(
           'Do Not Disturb Permission',
           'This app requires permission to modify Do Not Disturb settings.',
-          [{ text: 'OK', onPress: () => VolumeManager.requestDndAccess() }],
+          [{text: 'OK', onPress: () => VolumeManager.requestDndAccess()}],
         );
         return false;
       }
@@ -103,42 +142,53 @@ const SettingsScreen = () => {
     if (value) scheduleSilentModeForNextPrayer();
   };
 
-  const handleReminderSwitch =  value => {
+  const handleReminderSwitch = async value => {
     dispatch(setReminderEnabled(value));
-    
-    if (value && todayPrayers) {
-      const prayers =  getTodaysPrayers(); 
-       schedulePrayerAlarms(prayers)
+
+    if (value) { 
+      // behind this is a long story
+      // const prayers = await getTodaysPrayers();
+      // console.log("settings prayers",prayers);
+
+      // 
+      // schedulePrayerAlarms(prayers);
     } else {
       cancelAllScheduledNotifications();
       BackgroundFetch.stop();
     }
   };
 
-  
   return (
     <View style={CommonStyles.container}>
       <TransparentStatusbar />
       <AppHeader />
       <MainScreensHeader title="Settings" />
-      <View style={[CommonStyles.authBottomConatiner, { marginTop: 20 }]}>
+      <View style={[CommonStyles.authBottomConatiner, {marginTop: 20}]}>
         <View style={styles.alarmContainer}>
-          <View style={{ flex: 1 }}>
+          <View style={{flex: 1}}>
             <Text style={styles.alarmTitle}>Prayer Reminder Notification</Text>
             <Text style={styles.alarmDesc}>
-              Turn on Prayer Notifications to stay updated with the mosque’s prayer times.
+              Turn on Prayer Notifications to stay updated with the mosque’s
+              prayer times.
             </Text>
           </View>
-          <Switch value={isReminderEnabled} onValueChange={handleReminderSwitch} />
+          <Switch
+            value={isReminderEnabled}
+            onValueChange={handleReminderSwitch}
+          />
         </View>
         <View style={styles.alarmContainer}>
-          <View style={{ flex: 1 }}>
+          <View style={{flex: 1}}>
             <Text style={styles.alarmTitle}>Prayer Time Auto Silent</Text>
             <Text style={styles.alarmDesc}>
-              Automatically silence your mobile at prayer time and stay silent for 15 minutes.
+              Automatically silence your mobile at prayer time and stay silent
+              for 15 minutes.
             </Text>
           </View>
-          <Switch value={isAutoSilentEnabled} onValueChange={handleSilentModeSwitch} />
+          <Switch
+            value={isAutoSilentEnabled}
+            onValueChange={handleSilentModeSwitch}
+          />
         </View>
       </View>
     </View>
@@ -152,8 +202,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
   },
-  alarmTitle: { fontSize: 14, fontFamily: fonts.semibold, color: colors.black },
-  alarmDesc: { fontSize: 12, fontFamily: fonts.normal, color: colors.black },
+  alarmTitle: {fontSize: 14, fontFamily: fonts.semibold, color: colors.black},
+  alarmDesc: {fontSize: 12, fontFamily: fonts.normal, color: colors.black},
 });
 
 export default SettingsScreen;

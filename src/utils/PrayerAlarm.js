@@ -48,17 +48,20 @@ notifee.onForegroundEvent(({type, detail}) => {
   }
 });
 
-async function isNotificationScheduled(prayerName) {
+async function isNotificationScheduled(prayerName, triggerTimestamp) {
   const notifications = await notifee.getTriggerNotifications();
 
-  const exists = notifications.some(notification => {
-    return notification.notification?.title.includes(prayerName);
+  return notifications.some(notification => {
+    const {title} = notification.notification || {};
+    console.log('triger 1',notification.trigger?.timestamp,'triger 2',triggerTimestamp,'title 1',title,'title2',prayerName);
+    
+    return (
+      title.includes(prayerName) &&
+      notification.trigger?.timestamp === triggerTimestamp
+    );
+
   });
-
-  console.log(`Is ${prayerName} notification already scheduled?, exists`); // Debug line
-  return exists;
 }
-
 
 export async function schedulePrayerAlarms(prayers) {
   console.log('Notification data:', prayers);
@@ -75,13 +78,17 @@ export async function schedulePrayerAlarms(prayers) {
   });
 
   for (const prayer of prayers) {
-    const isScheduled = await isNotificationScheduled(prayer.name);
+    const formattedBeginTime = formatTo12Hour(prayer.time);
+    const formattedJamatTime = formatTo12Hour(prayer.jamatTime);
+    const triggerTimestamp = calculateTriggerTimestamp(prayer.time);
+    const isScheduled = await isNotificationScheduled(
+      prayer.name,
+      triggerTimestamp,
+    );
     if (isScheduled) {
       console.log(`Skipping ${prayer.name}, notification already scheduled.`);
       continue;
     }
-    const formattedTime = formatTo12Hour(prayer.time);
-    const triggerTimestamp = calculateTriggerTimestamp(prayer.time);
 
     if (!triggerTimestamp) {
       console.log(`Skipping ${prayer.name}, time has already passed.`);
@@ -98,7 +105,7 @@ export async function schedulePrayerAlarms(prayers) {
         {
           title: `${prayer.name}`,
           subtitle: appName,
-          body: `${prayer.name} prayer at - ${formattedTime}`,
+          body: `Begins: ${formattedBeginTime} | Jama'ah: ${formattedJamatTime}`,
           android: {
             channelId,
             smallIcon: 'ic_launcher',
@@ -109,16 +116,13 @@ export async function schedulePrayerAlarms(prayers) {
               launchActivity: 'default',
             },
             importance: AndroidImportance.HIGH,
-            fullScreenAction: {
-              id: 'default',
-            },
             visibility: AndroidVisibility.PUBLIC,
           },
         },
         trigger,
       );
       console.log(
-        `Notification scheduled successfully for ${prayer.name} at ${formattedTime}`,
+        `Notification scheduled successfully for ${prayer.name} at ${formattedBeginTime}`,
       );
     } catch (error) {
       console.error(

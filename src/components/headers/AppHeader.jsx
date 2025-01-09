@@ -29,11 +29,11 @@ const AppHeader = () => {
                     resizeMode="contain"
                 />
                 <Text style={styles.title} ellipsizeMode="tail">
-                    Markazi Jamia Ghausia Masjid{'\n'}<Text style={{textAlign:'center',fontSize:14,fontFamily:fonts.semibold}}>& Ghausia Madrassa</Text>
+                    Markazi Jamia Ghausia Masjid <Text style={{ textAlign: 'center', fontSize: 12, fontFamily: fonts.semibold,color:"#151515" }}>& Ghausia Madrassa</Text>
                 </Text>
             </View>
             <Pressable onPress={() => navigation.openDrawer()} style={styles.iconContainer}>
-                <Icons.Ionicons name="menu" size={22} color={colors.black}/>
+                <Icons.Ionicons name="menu" size={22} color={colors.black} />
             </Pressable>
         </View>
     );
@@ -53,6 +53,9 @@ const styles = StyleSheet.create({
     leftContainer: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
+        // backgroundColor:'blue',
+        flex: 1,
     },
     logo: {
         height: 80,
@@ -63,15 +66,18 @@ const styles = StyleSheet.create({
         color: colors.black,
         fontFamily: fonts.semibold,
         marginLeft: -5,
-        textAlign:'center'
+        marginRight: 5,
+        textAlign: 'left',
+        // backgroundColor:'red',
+        flex: 1
+
+
     },
     iconContainer: {
+        // flex:1,
         marginRight: 10,
-        justifyContent:'flex-end',
-        alignItems:'flex-end',
-        marginBottom:10,
-        flex:1,
-
-        // backgroundColor:'red'
+        justifyContent: 'flex-end',
+        alignItems: 'flex-end',
+        marginBottom: 10,
     },
 });

@@ -15,12 +15,12 @@ async function getTodaysPrayers() {
 
   // Define the prayer times you want to include
   const prayers = [
-    {name: 'Fajr', time: todayEntry.sehri_end},
-    {name: 'Zuhr', time: todayEntry.zuhar_begin},
-    {name: 'Asr', time: todayEntry.asar_begin},
-    {name: 'Maghrib', time: todayEntry.magrib_jamat},
-    {name: 'Isha', time: todayEntry.isha_begin},
-  ];
+    {name: 'Fajr', time: todayEntry?.sehri_end,jamatTime:todayEntry.fajar_jamat},
+    {name: 'Zuhr', time: todayEntry?.zuhar_begin,jamatTime:todayEntry.zuhar_jamat},
+    {name: 'Asr', time: todayEntry?.asar_begin,jamatTime:todayEntry.asar_jamat},
+    {name: 'Maghrib', time: todayEntry?.magrib_jamat,jamatTime:todayEntry.magrib_jamat},
+    {name: 'Isha', time: todayEntry?.isha_begin,jamatTime:todayEntry.isha_jamat},
+];
   
   return prayers;
 }

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -25,9 +25,11 @@ import {useFocusEffect} from '@react-navigation/native';
 import {checkAndRequestLocationPermission} from '../utils/LocationPermission';
 import {getCalendar} from '../reducers/calendarSlice';
 import {schedulePrayerAlarms} from '../utils/PrayerAlarm';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 const {height} = Dimensions.get('window');
-const headerCardHeight = height < 630 ? height * 0.2 : height * 0.25;
+const headerCardHeight = 130;
+// const headerCardHeight = height < 630 ? 160 : 130;
 
 const PrayerTimesScreen = () => {
   const [upcomingPrayer, setUpcomingPrayer] = useState({});
@@ -65,12 +67,34 @@ const PrayerTimesScreen = () => {
   useEffect(() => {
     if (isReminderEnabled && todayPrayers) {
       const prayersArray = [
-        {name: 'Fajr', time: todayPrayers?.sehri_end},
-        {name: 'Zuhr', time: todayPrayers?.zuhar_begin},
-        {name: 'Asr', time: todayPrayers?.asar_begin},
-        {name: 'Maghrib', time: todayPrayers?.magrib_jamat},
-        {name: 'Isha', time: todayPrayers?.isha_begin},
+        {
+          name: 'Fajr',
+          time: todayPrayers?.sehri_end,
+          jamatTime: todayPrayers.fajar_jamat,
+        },
+        {
+          name: 'Zuhr',
+          time: todayPrayers?.zuhar_begin,
+          jamatTime: todayPrayers.zuhar_jamat,
+        },
+        {
+          name: 'Asr',
+          time: todayPrayers?.asar_begin,
+          jamatTime: todayPrayers.asar_jamat,
+        },
+        {
+          name: 'Maghrib',
+          time: todayPrayers?.magrib_jamat,
+          jamatTime: todayPrayers.magrib_jamat,
+        },
+        {
+          name: 'Isha',
+          time: todayPrayers?.isha_begin,
+          jamatTime: todayPrayers.isha_jamat,
+        },
       ].filter(prayer => prayer.time);
+      console.log("prayersArray home",prayersArray);
+
       schedulePrayerAlarms(prayersArray);
     }
   }, [todayPrayers, isReminderEnabled]);
@@ -84,8 +108,8 @@ const PrayerTimesScreen = () => {
   // ============ Location End
   useEffect(() => {
     momenthijri.locale('en');
-    const hijriDate = momenthijri().format('iD iMMMM iYYYY'); 
-    setIslamicDate(hijriDate); 
+    const hijriDate = momenthijri().format('iD iMMMM iYYYY');
+    setIslamicDate(hijriDate);
   }, []);
 
   useEffect(() => {
@@ -94,11 +118,13 @@ const PrayerTimesScreen = () => {
     }
   }, [calendarData, selectedDate]);
 
-  useEffect(() => {
-    if (selectedDate === moment().format('DD MMMM, YYYY')) {
-      calculateUpcomingAndNextPrayers();
-    }
-  }, [todayPrayers, selectedDate]);
+  useFocusEffect(
+    useCallback(() => {
+      if (selectedDate === moment().format('DD MMMM, YYYY')) {
+        calculateUpcomingAndNextPrayers();
+      }
+    }, [selectedDate, todayPrayers]),
+  );
 
   const loadPrayersForDate = dateString => {
     const formattedDate = moment(dateString, 'DD MMMM').format('DD/MM');
@@ -110,7 +136,7 @@ const PrayerTimesScreen = () => {
     );
     setIslamicDate(hijriDate);
   };
- 
+
   const calculateUpcomingAndNextPrayers = () => {
     if (!todayPrayers || Object.keys(todayPrayers).length === 0) {
       setUpcomingPrayer(null);
@@ -119,11 +145,11 @@ const PrayerTimesScreen = () => {
     }
 
     const prayerSchedule = [
-      {name: 'Fajr', time: todayPrayers.sehri_end},
-      {name: 'Zuhr', time: todayPrayers.zuhar_begin},
-      {name: 'Asr', time: todayPrayers.asar_begin},
+      {name: 'Fajr', time: todayPrayers.fajar_jamat},
+      {name: 'Zuhr', time: todayPrayers.zuhar_jamat},
+      {name: 'Asr', time: todayPrayers.asar_jamat},
       {name: 'Maghrib', time: todayPrayers.magrib_jamat},
-      {name: 'Isha', time: todayPrayers.isha_begin},
+      {name: 'Isha', time: todayPrayers.isha_jamat},
     ];
 
     // const currentTime = moment('21:00', 'HH:mm');
@@ -224,7 +250,7 @@ const PrayerTimesScreen = () => {
     const today = moment().format('DD MMMM, YYYY');
     const isNextPrayer =
       selectedDate == today && upcomingPrayer?.name == prayerName;
-  
+
     return (
       <View
         style={[
@@ -303,7 +329,7 @@ const PrayerTimesScreen = () => {
                   <Text
                     style={{
                       color: colors.white,
-                      fontSize: height > 630 ? 36 : 30,
+                      fontSize: 30,
                       fontFamily: fonts.semibold,
                     }}>
                     {formatTimeTo12Hour(
@@ -313,11 +339,12 @@ const PrayerTimesScreen = () => {
                   <Text
                     style={{
                       fontSize: 14,
-                      color: colors.lighr_grey,
+                      color: colors.white,
                       fontFamily: fonts.medium,
                     }}>
-                    Begins in{' '}
-                    {calculateRemainingTime(upcomingPrayer?.time) || ''}
+                    Jama'ah in{' '}
+                    {calculateRemainingTime(upcomingPrayer?.time) ||
+                      nextPrayer?.time}
                   </Text>
                 </View>
               </View>
@@ -391,8 +418,8 @@ const PrayerTimesScreen = () => {
               <Text style={[styles.headerTitle, {textAlign: 'left'}]}>
                 Salah
               </Text>
-              <Text style={styles.headerTitle}>Adhan</Text>
-              <Text style={styles.headerTitle}>Jamaat</Text>
+              <Text style={styles.headerTitle}>Begin</Text>
+              <Text style={styles.headerTitle}>Jama'ah</Text>
             </View>
           )}
           renderItem={({item}) => {
@@ -440,13 +467,28 @@ const PrayerTimesScreen = () => {
         {jumaTimings.khutbah && (
           <>
             <View style={styles.jumaheading}>
-              <Icons.Feather name="clock" size={20} color={colors.primary} />
+              <View
+                style={{
+                  borderColor: colors.lighr_grey,
+                  borderBottomWidth: 1,
+                  flex: 1,
+                  marginStart: 25,
+                }}></View>
+
               <Text style={styles.jumaheadingtxt}>Jumu'ah Time</Text>
+              <View
+                style={{
+                  borderColor: colors.lighr_grey,
+                  flex: 1,
+                  marginEnd: 25,
+                  borderBottomWidth: 1,
+                }}></View>
             </View>
+            {/* <View style={{borderColor:colors.lighr_grey,borderBottomWidth:1,marginHorizontal:40,marginBottom:10}}></View> */}
             <View style={styles.jumaitme}>
               <View style={styles.jumaheader}>
                 <Text style={styles.jumatitle}>Khutbah</Text>
-                <Text style={styles.jumatitle}>Salah</Text>
+                <Text style={styles.jumatitle}>Jama'ah</Text>
               </View>
               <View style={styles.jumatimecontainer}>
                 <Text style={styles.jumatimetext}>
@@ -492,8 +534,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   dateContainer: {
-    marginTop: 12,
-    marginBottom: 12,
+    marginTop: 5,
+    marginBottom: 8,
     marginHorizontal: 20,
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -513,16 +555,16 @@ const styles = StyleSheet.create({
     zIndex: 100, // Ensure it stays on top
   },
   dateText: {
-    fontSize: 16,
+    fontSize: 15,
     color: colors.black,
     fontFamily: fonts.bold,
   },
 
   listHeaderItem: {
     paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingVertical: 8,
     borderRadius: 8,
-    width: '92%',
+    width: '90%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignSelf: 'center',
@@ -531,8 +573,8 @@ const styles = StyleSheet.create({
     shadowColor: colors.teal,
     shadowOffset: {width: 0, height: 4},
     shadowRadius: 5,
-    elevation: height > 630 ? 4 : 2,
-    marginTop: 10,
+    elevation: 2,
+    marginTop: 8,
   },
   prayerItem: {
     width: '90%',
@@ -541,14 +583,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.bg_clr,
     paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingVertical: 8,
     borderRadius: 8,
     shadowColor: colors.primary,
     shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.5,
     shadowRadius: 5,
-    elevation: height > 630 ? 4 : 2,
-    marginBottom: 20,
+    elevation: 2,
+    marginBottom: 14,
   },
   jumaitme: {
     width: '90%',
@@ -556,13 +598,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: colors.bg_clr,
     paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingVertical: 8,
     borderRadius: 8,
     shadowColor: colors.primary,
     shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.5,
     shadowRadius: 5,
-    elevation: height > 630 ? 4 : 2,
+    elevation: 2,
     marginBottom: 20,
   },
   jumaheader: {
@@ -579,14 +621,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 10,
     marginBottom: 10,
+    alignItems: 'center',
   },
   jumaheadingtxt: {
-    fontSize: 16,
+    fontSize: 12,
     fontFamily: fonts.bold,
     color: colors.primary,
   },
   jumatitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: colors.primary,
     fontFamily: fonts.bold,
   },
@@ -597,7 +640,7 @@ const styles = StyleSheet.create({
     paddingTop: 5,
   },
   headerTitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: colors.primary,
     fontFamily: fonts.bold,
     flex: 1,
@@ -621,7 +664,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.semibold,
   },
   prayerText: {
-    fontSize: 16,
+    fontSize: 15,
     color: colors.black,
     fontFamily: fonts.normal,
     flex: 1,

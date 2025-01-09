@@ -4,6 +4,7 @@ const signupURL = 'auth/register';
 const loginURL = 'auth/login';
 const prayerTimesURL = 'prayer-times';
 const mosqueInfoURL = 'mosque-info/';
+// const appName = 'Nelson Ghausia Masjid';
 const appName = 'Markazi Jamia Ghausia Masjid';
 const verifyTokenURL='auth/verify/'
 const GET = 'GET';
