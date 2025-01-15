@@ -14,7 +14,7 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
-target 'MosqueApp' do
+target 'MosqueUserApp' do
   config = use_native_modules!
   pod 'react-native-background-timer', :path => '../node_modules/react-native-background-timer'
 
@@ -24,7 +24,7 @@ target 'MosqueApp' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-  target 'MosqueAppTests' do
+  target 'MosqueUserAppTests' do
     inherit! :complete
     # Pods for testing
   end

@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "MosqueApp.app"
-               BlueprintName = "MosqueApp"
-               ReferencedContainer = "container:MosqueApp.xcodeproj">
+               BuildableName = "MosqueUserApp.app"
+               BlueprintName = "MosqueUserApp"
+               ReferencedContainer = "container:MosqueUserApp.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "MosqueAppTests.xctest"
-               BlueprintName = "MosqueAppTests"
-               ReferencedContainer = "container:MosqueApp.xcodeproj">
+               BuildableName = "MosqueUserAppTests.xctest"
+               BlueprintName = "MosqueUserAppTests"
+               ReferencedContainer = "container:MosqueUserApp.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "MosqueApp.app"
-            BlueprintName = "MosqueApp"
-            ReferencedContainer = "container:MosqueApp.xcodeproj">
+            BuildableName = "MosqueUserApp.app"
+            BlueprintName = "MosqueUserApp"
+            ReferencedContainer = "container:MosqueUserApp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "MosqueApp.app"
-            BlueprintName = "MosqueApp"
-            ReferencedContainer = "container:MosqueApp.xcodeproj">
+            BuildableName = "MosqueUserApp.app"
+            BlueprintName = "MosqueUserApp"
+            ReferencedContainer = "container:MosqueUserApp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
