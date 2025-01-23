@@ -1,18 +1,19 @@
 // src/navigation/MainNavigator.js
 import React from 'react';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import PrayerTimesScreen from '../screens/PrayerTimesScreen';
 import QiblaScreen from '../screens/QiblaScreen';
 import MosqueLocationScreen from '../screens/MosqueLocationScreen';
 import DonationScreen from '../screens/DonationScreen';
 import colors from '../assets/colors/AppColors';
-import {Icons} from '../assets/icons/Icons';
+import { Icons } from '../assets/icons/Icons';
 import fonts from '../assets/fonts/MyFonts';
 import SettingsScreen from '../screens/SettingsScreen';
 import AboutScreen from '../screens/AboutScreen';
-import {createDrawerNavigator} from '@react-navigation/drawer';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 import ContactScreen from '../screens/ContactScreen';
 import CustomDrawerContent from './CustomDrawerContent';
+import { BOTTOM_TAB_BAR_HEIGHT, useInsets } from '../utils/appDimentions';
 
 const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
@@ -23,9 +24,15 @@ const iconSize = 22;
 const iconColorD = colors.white;
 // const iconColorD = 'rgba(0,0,0,0.6)';
 const iconSizeD = 15;
-const HomeTabNavigator = () => (
+const HomeTabNavigator = () => 
+{
+  const { bottom } = useInsets()
+
+  return(
+
+
   <Tab.Navigator
-    screenOptions={({route}) => ({
+    screenOptions={({ route }) => ({
       headerShown: false,
       tabBarLabelStyle: {
         fontSize: 12,
@@ -37,11 +44,11 @@ const HomeTabNavigator = () => (
         backgroundColor: colors.white,
       },
       tabBarStyle: {
-        height: 60,
+        height:  BOTTOM_TAB_BAR_HEIGHT + bottom,
         // borderTopColor:colors.primary,
         borderTopWidth: 0,
         shadowColor: colors.black,
-        shadowOffset: {width: 0, height: 4},
+        shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.5,
         shadowRadius: 5,
         // Elevation for Android
@@ -51,7 +58,7 @@ const HomeTabNavigator = () => (
       tabBarInactiveTintColor: inactiveColor,
       tabBarHideOnKeyboard: 'true',
       tabBarPressColor: 'rgba(255,255,255,0.6)',
-      tabBarIcon: ({focused}) => {
+      tabBarIcon: ({ focused }) => {
         let iconColor = focused ? activeColor : inactiveColor;
         if (route.name === 'Prayer Times') {
           return (
@@ -99,19 +106,20 @@ const HomeTabNavigator = () => (
     })}>
     <Tab.Screen
       name="Prayer Times"
-      options={{title: 'Times'}}
+      options={{ title: 'Times' }}
       component={PrayerTimesScreen}
     />
     <Tab.Screen name="Qibla" component={QiblaScreen} />
     <Tab.Screen
       name="Mosque Location"
-      options={{title: 'Location'}}
+      options={{ title: 'Location' }}
       component={MosqueLocationScreen}
     />
     <Tab.Screen name="Donate" component={DonationScreen} />
     <Tab.Screen name="Settings" component={SettingsScreen} />
   </Tab.Navigator>
 );
+}
 
 const MainNavigator = () => (
   <Drawer.Navigator
@@ -140,7 +148,7 @@ const MainNavigator = () => (
     <Drawer.Screen
       name="Home"
       options={{
-        drawerIcon: ({color, size}) => (
+        drawerIcon: ({ color, size }) => (
           <Icons.Octicons name="home" size={iconSizeD} color={iconColorD} />
         ),
       }}
@@ -149,7 +157,7 @@ const MainNavigator = () => (
     <Drawer.Screen
       name="About"
       options={{
-        drawerIcon: ({color, size}) => (
+        drawerIcon: ({ color, size }) => (
           <Icons.SimpleLineIcons
             name="info"
             size={iconSizeD}
@@ -161,7 +169,7 @@ const MainNavigator = () => (
     />
     <Drawer.Screen
       options={{
-        drawerIcon: ({color, size}) => (
+        drawerIcon: ({ color, size }) => (
           <Icons.AntDesign
             name="contacts"
             size={iconSizeD}

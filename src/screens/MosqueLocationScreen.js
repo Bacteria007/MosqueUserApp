@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef} from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -6,12 +6,13 @@ import {
   Alert,
   Text,
   Platform,
-  PermissionsAndroid,
+  // PermissionsAndroid,
   Linking,
+  SafeAreaView,
 } from 'react-native';
-import MapView, {Marker, Polyline} from 'react-native-maps';
+import MapView, { Marker, Polyline } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
-import {check, PERMISSIONS, RESULTS} from 'react-native-permissions';
+import { check, PERMISSIONS, RESULTS } from 'react-native-permissions';
 import DeviceInfo from 'react-native-device-info'; // Import DeviceInfo for GPS check
 import MainScreensHeader from '../components/headers/MainScreensHeader';
 import MyImages from '../assets/images/MyImages';
@@ -19,12 +20,12 @@ import axios from 'axios';
 import colors from '../assets/colors/AppColors';
 import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
 import AppHeader from '../components/headers/AppHeader';
-import {GOOGLE_MAPS_APIKEY} from '../services/constants';
-import {useFocusEffect} from '@react-navigation/native';
+import { GOOGLE_MAPS_APIKEY } from '../services/constants';
+import { useFocusEffect } from '@react-navigation/native';
 
 const mosqueLocation = {
   latitude: 53.839029,
-  longitude:-2.215966,
+  longitude: -2.215966,
 };
 
 const MosqueLocationScreen = () => {
@@ -92,7 +93,7 @@ const MosqueLocationScreen = () => {
         fetchRoute(location, mosqueLocation);
         centerMap(location);
       },
-      
+
       error => {
         console.log('Location error:', error);
         showEnableLocationAlert(); // Prompt to enable location if error
@@ -106,7 +107,7 @@ const MosqueLocationScreen = () => {
       'Enable Location',
       'Please enable location services and ensure GPS is on.',
       [
-        {text: 'Cancel', style: 'cancel'},
+        { text: 'Cancel', style: 'cancel' },
         {
           text: 'Enable',
           onPress: () =>
@@ -189,7 +190,7 @@ const MosqueLocationScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <TransparentStatusbar />
       <AppHeader />
       <MainScreensHeader
@@ -197,6 +198,7 @@ const MosqueLocationScreen = () => {
         title="Mosque Coordinates"
       />
       <MapView
+      mapType='terrain'
         ref={mapRef}
         style={styles.map}
         showsUserLocation
@@ -222,14 +224,22 @@ const MosqueLocationScreen = () => {
           />
         )}
       </MapView>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {flex: 1, backgroundColor: colors.white},
-  map: {flex: 1},
-  markerContainer: {justifyContent: 'center', alignItems: 'center'},
+  container: {
+    flex: 1,
+    backgroundColor: colors.white
+  },
+  map: {
+    flex: 1
+  },
+  markerContainer: {
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
   markerImage: {
     height: 35,
     width: 35,

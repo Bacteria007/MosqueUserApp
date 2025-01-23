@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, ScrollView, StyleSheet} from 'react-native';
+import {View, Text, ScrollView, StyleSheet, SafeAreaView} from 'react-native';
 import CommonStyles from '../assets/styles/CommonStyles';
 import colors from '../assets/colors/AppColors';
 import fonts from '../assets/fonts/MyFonts';
@@ -9,7 +9,7 @@ import MainScreensHeader from '../components/headers/MainScreensHeader';
 
 const AboutScreen = () => {
   return (
-    <View style={CommonStyles.container}>
+    <SafeAreaView style={CommonStyles.container}>
       <TransparentStatusbar />
       <AppHeader />
       <ScrollView style={styles.scrollContainer}>
@@ -26,7 +26,7 @@ const AboutScreen = () => {
           prayer reminders. We would welcome your feedback.
         </Text>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 

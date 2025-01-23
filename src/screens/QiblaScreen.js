@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useCallback} from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   Platform,
   Animated,
   StatusBar,
+  SafeAreaView,
 } from 'react-native';
 import CompassHeading from 'react-native-compass-heading';
 import Geolocation from '@react-native-community/geolocation';
@@ -17,7 +18,7 @@ import fonts from '../assets/fonts/MyFonts';
 import CommonStyles from '../assets/styles/CommonStyles';
 import ScreenWrapper from '../components/wrapers/ScreenWrapper';
 import MainScreensHeader from '../components/headers/MainScreensHeader';
-import {Icons} from '../assets/icons/Icons';
+import { Icons } from '../assets/icons/Icons';
 import MyHeader from '../components/headers/MyHeader';
 import WhiteStatusbar from '../components/statusbar/WhiteStatusbar';
 import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
@@ -33,7 +34,7 @@ const QiblaScreen = () => {
     Geolocation.getCurrentPosition(
       position => {
         console.log(position); // Log the position
-        const {latitude, longitude} = position.coords;
+        const { latitude, longitude } = position.coords;
         const calculatedQiblaDirection = calculateQiblaDirection(
           latitude,
           longitude,
@@ -61,7 +62,7 @@ const QiblaScreen = () => {
 
     const degree_update_rate = 0.5;
 
-    CompassHeading.start(degree_update_rate, ({heading: newHeading}) => {
+    CompassHeading.start(degree_update_rate, ({ heading: newHeading }) => {
       setHeading(newHeading);
     });
 
@@ -104,10 +105,11 @@ const QiblaScreen = () => {
   });
 
   return (
-    <ScreenWrapper refreshAct={() => getCurrentLocation()}>
-      <TransparentStatusbar />
-      <AppHeader/>
-      <View style={CommonStyles.container}>
+    <SafeAreaView style={CommonStyles.container}>
+      <ScreenWrapper refreshAct={() => getCurrentLocation()}>
+        <TransparentStatusbar />
+        <AppHeader />
+        <View style={{ flex: 1 }}>
           <MainScreensHeader
             title={`${qiblaDirection.toFixed(2)}°`}
             subTitle={'Qibla Direction'}
@@ -128,13 +130,13 @@ const QiblaScreen = () => {
                 source={MyImages.needle_msjid}
                 style={[
                   styles.needle,
-                  {transform: [{rotate: rotateInterpolate}]},
+                  { transform: [{ rotate: rotateInterpolate }] },
                 ]}
               />
             </View>
 
             {/* Text and Qibla Information in a Card */}
-              {/* <Text style={styles.infoText}>Heading: {heading.toFixed(2)}°</Text> */}
+            {/* <Text style={styles.infoText}>Heading: {heading.toFixed(2)}°</Text> */}
             {/* <View style={styles.infoCard}>
               <Icons.MaterialCommunityIcons
                 name="compass"
@@ -152,7 +154,8 @@ const QiblaScreen = () => {
           </Text> */}
           </View>
         </View>
-    </ScreenWrapper>
+      </ScreenWrapper>
+    </SafeAreaView>
   );
 };
 
@@ -163,7 +166,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.bg_clr,
   },
-  
+
   compassCard: {
     width: 260,
     height: 260,
@@ -174,7 +177,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     // iOS shadow
     shadowColor: colors.primary,
-    shadowOffset: {width: 0, height: 4},
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 4.65,
     // Android elevation
@@ -191,7 +194,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     // iOS shadow
     shadowColor: colors.white,
-    shadowOffset: {width: 0, height: 4},
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 4.65,
     // Android elevation

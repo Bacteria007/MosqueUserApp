@@ -6,6 +6,7 @@ import {
   ScrollView,
   Linking,
   TouchableOpacity,
+  SafeAreaView,
 } from 'react-native';
 import {Icons} from '../assets/icons/Icons'; // Assuming your icons are imported here
 import colors from '../assets/colors/AppColors';
@@ -20,7 +21,7 @@ const ContactScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <TransparentStatusbar />
       <AppHeader />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -116,7 +117,7 @@ const ContactScreen = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 

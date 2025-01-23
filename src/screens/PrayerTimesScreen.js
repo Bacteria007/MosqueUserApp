@@ -9,6 +9,7 @@ import {
   ImageBackground,
   Dimensions,
   ScrollView,
+  SafeAreaView,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import moment from 'moment';
@@ -307,7 +308,7 @@ const PrayerTimesScreen = () => {
   const isToday = selectedDate == moment().format('DD MMMM, YYYY');
 
   return (
-    <View style={CommonStyles.container}>
+    <SafeAreaView style={CommonStyles.container}>
       <TransparentStatusbar />
       <AppHeader />
       <ScrollView
@@ -502,7 +503,7 @@ const PrayerTimesScreen = () => {
           </>
         )}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 

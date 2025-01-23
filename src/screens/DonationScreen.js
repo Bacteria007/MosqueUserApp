@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TextInput,
   Image,
   ScrollView,
+  SafeAreaView,
 } from 'react-native';
 import CommonStyles from '../assets/styles/CommonStyles';
 import MainScreensHeader from '../components/headers/MainScreensHeader';
@@ -14,7 +15,7 @@ import colors from '../assets/colors/AppColors';
 import fonts from '../assets/fonts/MyFonts';
 import DonationTextinput from '../components/inputs/DonationTextinput';
 import MyImages from '../assets/images/MyImages';
-import {Icons} from '../assets/icons/Icons';
+import { Icons } from '../assets/icons/Icons';
 import ReactNativeModal from 'react-native-modal';
 import PrimaryButton from '../components/buttons/PrimaryButton';
 import TransparentStatusbar from '../components/statusbar/TransparentStatusbar';
@@ -74,14 +75,14 @@ const DonationScreen = () => {
   };
 
   return (
-    <View style={[CommonStyles.container]}>
+    <SafeAreaView style={[CommonStyles.container]}>
       <TransparentStatusbar />
       <AppHeader />
       <MainScreensHeader title={'Donate'} />
-<View style={{flex:1,justifyContent:'center'}}>
+      <View style={{ flex: 1, justifyContent: 'center' }}>
 
-      <Text style={styles.undertext}>This feature is under development</Text>
-</View>
+        <Text style={styles.undertext}>This feature is under development</Text>
+      </View>
       {/* {step == 1 && (
         <ScrollView contentContainerStyle={{flexGrow: 1}}>
           <View
@@ -225,7 +226,7 @@ const DonationScreen = () => {
       <ReactNativeModal
         statusBarTranslucent
         visible={isModalVisible}
-        style={{margin: 0, flex: 1}}
+        style={{ margin: 0, flex: 1 }}
         animationIn={'fadeIn'}
         animationOut={'fadeOut'}
         onDismiss={onDismiss}
@@ -255,7 +256,7 @@ const DonationScreen = () => {
           </View>
         </View>
       </ReactNativeModal>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -264,7 +265,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: fonts.semibold,
     color: colors.light_black,
-    textAlign:'center'
+    textAlign: 'center'
   },
   radioGroup: {
     marginTop: 20,

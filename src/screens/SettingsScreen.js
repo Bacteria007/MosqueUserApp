@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, Switch, StyleSheet, Alert} from 'react-native';
+import {View, Text, Switch, StyleSheet, Alert, SafeAreaView} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {
   VolumeManager,
@@ -159,7 +159,7 @@ const SettingsScreen = () => {
   };
 
   return (
-    <View style={CommonStyles.container}>
+    <SafeAreaView style={CommonStyles.container}>
       <TransparentStatusbar />
       <AppHeader />
       <MainScreensHeader title="Settings" />
@@ -191,7 +191,7 @@ const SettingsScreen = () => {
           />
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
