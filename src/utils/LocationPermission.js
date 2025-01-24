@@ -4,17 +4,33 @@ import {check, PERMISSIONS, RESULTS} from 'react-native-permissions';
 import DeviceInfo from 'react-native-device-info';
 
 export const checkAndRequestLocationPermission = async () => {
-  const permissionStatus = await check(
-    Platform.OS === 'android'
-      ? PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION
-      : PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
-  );
 
-  if (permissionStatus === RESULTS.GRANTED) {
-    checkIfLocationServicesEnabled();
-  } else {
-    requestLocationPermission();
-  }
+     if (Platform.OS === 'android') {
+       const permissionStatus = await check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
+   
+       if (permissionStatus === RESULTS.GRANTED) {
+         checkIfLocationServicesEnabled(); // If permission granted, check GPS
+       } else {
+         await requestLocationPermission(); // Request permission if not granted
+       }
+     } else if (Platform.OS === 'ios') {
+       const permissionStatus = await check(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+   
+       if (permissionStatus === RESULTS.GRANTED) {
+         checkIfLocationServicesEnabled(); // If permission granted, check GPS
+       } else {
+         console.log('Location permission not granted on iOS');
+         Alert.alert(
+           'Location Permission Required',
+           'We need access to your location to show relevant information.',
+           [
+             { text: 'Cancel', style: 'cancel' },
+             { text: 'Open Settings', onPress: () => Linking.openSettings() },
+           ],
+         );
+       }
+     }
+ 
 };
 
 const checkIfLocationServicesEnabled = async () => {
