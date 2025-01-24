@@ -9,6 +9,7 @@ import {
   PermissionsAndroid,
   Linking,
   SafeAreaView,
+  Pressable,
 } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
@@ -42,7 +43,7 @@ const MosqueLocationScreen = () => {
   const checkAndRequestLocationPermission = async () => {
     if (Platform.OS === 'android') {
       const permissionStatus = await check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
-  
+
       if (permissionStatus === RESULTS.GRANTED) {
         checkIfLocationServicesEnabled(); // If permission granted, check GPS
       } else {
@@ -50,7 +51,7 @@ const MosqueLocationScreen = () => {
       }
     } else if (Platform.OS === 'ios') {
       const permissionStatus = await check(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
-  
+
       if (permissionStatus === RESULTS.GRANTED) {
         checkIfLocationServicesEnabled(); // If permission granted, check GPS
       } else {
@@ -89,7 +90,7 @@ const MosqueLocationScreen = () => {
           buttonPositive: 'OK',
         },
       );
-  
+
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         checkIfLocationServicesEnabled(); // Check GPS if permission granted
       } else {
@@ -216,32 +217,42 @@ const MosqueLocationScreen = () => {
         subTitle="Mosque Location"
         title="Mosque Coordinates"
       />
-      <MapView
-        ref={mapRef}
-        style={styles.map}
-        showsUserLocation
-        showsMyLocationButton
-        initialRegion={{
-          ...mosqueLocation,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        }}>
-        <Marker
-          coordinate={mosqueLocation}
-          title="Location"
-          description="Ghausia Nelson">
-          <View style={styles.markerContainer}>
-            <Image source={MyImages.logo} style={styles.markerImage} />
-          </View>
-        </Marker>
-        {currentLocation && (
-          <Polyline
-            coordinates={routeCoords}
-            strokeColor={colors.primary}
-            strokeWidth={3}
-          />
-        )}
-      </MapView>
+      {currentLocation ? (
+        <MapView
+          ref={mapRef}
+          style={styles.map}
+          showsUserLocation
+          showsMyLocationButton
+          initialRegion={{
+            ...mosqueLocation,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          }}>
+          <Marker
+            coordinate={mosqueLocation}
+            title="Location"
+            description="Ghausia Nelson">
+            <View style={styles.markerContainer}>
+              <Image source={MyImages.logo} style={styles.markerImage} />
+            </View>
+          </Marker>
+          {currentLocation && (
+            <Polyline
+              coordinates={routeCoords}
+              strokeColor={colors.primary}
+              strokeWidth={3}
+            />
+          )}
+        </MapView>
+      ) : (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text>Please allow location permission to proceed.</Text>
+          <Pressable style={styles.allowBtn} onPress={checkAndRequestLocationPermission}>
+            <Text style={styles.allowBtnText}>{`Allow Location`}</Text>
+          </Pressable>
+        </View>
+      )}
+
     </SafeAreaView>
   );
 };
@@ -253,6 +264,18 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1
+  },
+  allowBtn: {
+    backgroundColor: colors.primary,
+    marginVertical: 20,
+    paddingVertical: 7.5,
+    paddingHorizontal: 40,
+    borderRadius: 10
+  },
+  allowBtnText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: '500',
   },
   markerContainer: {
     justifyContent: 'center',
