@@ -6,7 +6,7 @@ import {
   Alert,
   Text,
   Platform,
-  // PermissionsAndroid,
+  PermissionsAndroid,
   Linking,
   SafeAreaView,
 } from 'react-native';
@@ -40,16 +40,30 @@ const MosqueLocationScreen = () => {
   );
 
   const checkAndRequestLocationPermission = async () => {
-    const permissionStatus = await check(
-      Platform.OS === 'android'
-        ? PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION
-        : PERMISSIONS.IOS.LOCATION_WHEN_IN_USE,
-    );
-
-    if (permissionStatus === RESULTS.GRANTED) {
-      checkIfLocationServicesEnabled(); // If permission granted, check GPS
-    } else {
-      requestLocationPermission(); // Request permission if not granted
+    if (Platform.OS === 'android') {
+      const permissionStatus = await check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
+  
+      if (permissionStatus === RESULTS.GRANTED) {
+        checkIfLocationServicesEnabled(); // If permission granted, check GPS
+      } else {
+        await requestLocationPermission(); // Request permission if not granted
+      }
+    } else if (Platform.OS === 'ios') {
+      const permissionStatus = await check(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+  
+      if (permissionStatus === RESULTS.GRANTED) {
+        checkIfLocationServicesEnabled(); // If permission granted, check GPS
+      } else {
+        console.log('Location permission not granted on iOS');
+        Alert.alert(
+          'Location Permission Required',
+          'We need access to your location to show relevant information.',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Open Settings', onPress: () => Linking.openSettings() },
+          ],
+        );
+      }
     }
   };
 
@@ -63,24 +77,49 @@ const MosqueLocationScreen = () => {
   };
 
   const requestLocationPermission = async () => {
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      {
-        title: 'Location Permission',
-        message:
-          'We need access to your location to show you relevant information.',
-        buttonNeutral: 'Ask Me Later',
-        buttonNegative: 'Cancel',
-        buttonPositive: 'OK',
-      },
-    );
-
-    if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-      checkIfLocationServicesEnabled(); // Check GPS if permission granted
-    } else {
-      console.log('Location permission denied');
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: 'Location Permission',
+          message:
+            'We need access to your location to show you relevant information.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+  
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        checkIfLocationServicesEnabled(); // Check GPS if permission granted
+      } else {
+        console.log('Location permission denied');
+      }
+    } catch (err) {
+      console.warn(err);
     }
   };
+
+
+  // const requestLocationPermission = async () => {
+  //   const granted = await PermissionsAndroid.request(
+  //     PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+  //     {
+  //       title: 'Location Permission',
+  //       message:
+  //         'We need access to your location to show you relevant information.',
+  //       buttonNeutral: 'Ask Me Later',
+  //       buttonNegative: 'Cancel',
+  //       buttonPositive: 'OK',
+  //     },
+  //   );
+
+  //   if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+  //     checkIfLocationServicesEnabled(); // Check GPS if permission granted
+  //   } else {
+  //     console.log('Location permission denied');
+  //   }
+  // };
 
   const getCurrentLocation = () => {
     Geolocation.getCurrentPosition(
@@ -89,6 +128,7 @@ const MosqueLocationScreen = () => {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
         };
+        console.log("current location ==", JSON.stringify(location, null, 2));
         setCurrentLocation(location); // Save location to state
         fetchRoute(location, mosqueLocation);
         centerMap(location);
@@ -198,7 +238,6 @@ const MosqueLocationScreen = () => {
         title="Mosque Coordinates"
       />
       <MapView
-      mapType='terrain'
         ref={mapRef}
         style={styles.map}
         showsUserLocation
