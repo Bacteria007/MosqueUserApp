@@ -115,7 +115,7 @@ const HomeTabNavigator = () =>
       options={{ title: 'Location' }}
       component={MosqueLocationScreen}
     />
-    <Tab.Screen name="Donate" component={DonationScreen} />
+    {/* <Tab.Screen name="Donate" component={DonationScreen} /> */}
     <Tab.Screen name="Settings" component={SettingsScreen} />
   </Tab.Navigator>
 );
